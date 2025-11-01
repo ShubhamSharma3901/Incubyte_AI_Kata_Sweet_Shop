@@ -1,3 +1,6 @@
+/**
+ * @file Unit tests for UserService covering registration, login, and profile flows.
+ */
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { UserService } from '../../services/userService';
 

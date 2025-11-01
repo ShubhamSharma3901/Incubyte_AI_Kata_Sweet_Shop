@@ -1,3 +1,6 @@
+/**
+ * @file Vitest setup file that tears down Prisma connections after testing.
+ */
 import { afterAll } from "vitest";
 
 // Only create PrismaClient if DATABASE_URL is set (not in CI/test environments)

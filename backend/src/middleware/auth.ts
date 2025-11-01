@@ -1,7 +1,17 @@
+/**
+ * @file Authentication and authorization middleware helpers.
+ */
 import { Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/auth';
 import { AuthenticatedRequest } from '../types';
 
+/**
+ * Ensures the request contains a valid bearer token and attaches the decoded payload.
+ *
+ * @param req Express request with optional authenticated user payload.
+ * @param res Express response used for returning authentication errors.
+ * @param next Invokes the next middleware when authentication succeeds.
+ */
 export const authenticate = (
     req: AuthenticatedRequest,
     res: Response,
@@ -23,6 +33,13 @@ export const authenticate = (
     }
 };
 
+/**
+ * Requires the authenticated user to have an ADMIN role; otherwise responds with 403.
+ *
+ * @param req Authenticated request expected to include `user` metadata.
+ * @param res Express response used for returning authorization errors.
+ * @param next Invokes the next middleware when authorization succeeds.
+ */
 export const requireAdmin = (
     req: AuthenticatedRequest,
     res: Response,

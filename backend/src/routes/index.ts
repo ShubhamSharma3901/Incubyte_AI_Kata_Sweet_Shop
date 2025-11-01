@@ -1,17 +1,23 @@
-import { Router } from 'express';
-import userRoutes from './userRoutes';
+/**
+ * @file Root router that aggregates user and sweet domain routes.
+ */
+import { Router } from "express";
+import userRoutes from "./userRoutes";
+import sweetRoutes from "./sweetRoutes";
 
+/** Primary API router instance. */
 const router = Router();
 
-router.use('/users', userRoutes);
+router.use("/users", userRoutes);
+router.use("/sweets", sweetRoutes);
 
-// Health check
-router.get('/health', (req, res) => {
-    res.json({
-        status: 'OK',
-        timestamp: new Date().toISOString(),
-        service: 'Sweet Shop API'
-    });
+/** Lightweight health check accessible under the API namespace. */
+router.get("/health", (req, res) => {
+	res.json({
+		status: "OK",
+		timestamp: new Date().toISOString(),
+		service: "Sweet Shop API",
+	});
 });
 
 export default router;

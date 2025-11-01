@@ -1,3 +1,6 @@
+/**
+ * @file Integration-style route tests covering User endpoints.
+ */
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import request from "supertest";
 
