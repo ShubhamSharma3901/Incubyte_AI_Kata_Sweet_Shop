@@ -1,8 +1,12 @@
-import { afterAll } from 'vitest';
-import { PrismaClient } from '@prisma/client';
+import { afterAll } from "vitest";
 
-const prisma = new PrismaClient();
+// Only create PrismaClient if DATABASE_URL is set (not in CI/test environments)
+// In tests, we use mocks instead of real database connections
+if (process.env.DATABASE_URL) {
+	const { PrismaClient } = require("@prisma/client");
+	const prisma = new PrismaClient();
 
-afterAll(async () => {
-    await prisma.$disconnect();
-});
+	afterAll(async () => {
+		await prisma.$disconnect();
+	});
+}
