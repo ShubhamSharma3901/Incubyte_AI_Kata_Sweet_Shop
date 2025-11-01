@@ -1,10 +1,15 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { UserService } from '../../services/userService';
-import { prismaClient as prisma } from '../../__mocks__/db';
-import * as authUtils from '../../utils/auth';
 
 // Mock the database
-vi.mock('../../__mocks__/db');
+vi.mock('../../config/database', () => ({
+    default: {
+        user: {
+            findUnique: vi.fn(),
+            create: vi.fn(),
+        },
+    },
+}));
 
 // Mock auth utilities
 vi.mock('../../utils/auth', () => ({
@@ -12,6 +17,10 @@ vi.mock('../../utils/auth', () => ({
     comparePassword: vi.fn(),
     generateToken: vi.fn(),
 }));
+
+// Import the mocked modules
+import prisma from '../../config/database';
+import * as authUtils from '../../utils/auth';
 
 describe('UserService', () => {
     let userService: UserService;

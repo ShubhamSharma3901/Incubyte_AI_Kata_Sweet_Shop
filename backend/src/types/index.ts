@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Request } from "express";
 
 export const CreateUserSchema = z.object({
     email: z.string().email(),
