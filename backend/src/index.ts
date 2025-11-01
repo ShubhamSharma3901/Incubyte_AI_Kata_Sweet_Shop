@@ -16,12 +16,13 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // JSON parsing error handler
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction): void => {
     if (err instanceof SyntaxError && 'body' in err) {
-        return res.status(400).json({
+        res.status(400).json({
             error: 'Invalid JSON format',
             message: 'Please check your request body for valid JSON syntax'
         });
+        return;
     }
     next(err);
 });
@@ -39,7 +40,7 @@ app.get('/health', (req, res) => {
 app.use('/api', routes);
 
 // Error handling
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction): void => {
     console.error(err.stack);
     res.status(500).json({ error: 'Something went wrong!' });
 });
@@ -49,11 +50,5 @@ app.use('*', (req, res) => {
     res.status(404).json({ error: 'Route not found' });
 });
 
-// Start server
-if (process.env.NODE_ENV !== 'test') {
-    app.listen(PORT, () => {
-        console.log(`🚀 Server running on port ${PORT}`);
-    });
-}
 
 export default app;
