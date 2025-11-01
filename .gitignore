@@ -13,8 +13,8 @@ frontend/build/
 .env.development.local
 .env.test.local
 .env.production.local
-backend/.env
-frontend/.env
+backend/.env.*
+frontend/.env.*
 
 # Logs
 *.log
@@ -47,3 +47,5 @@ Thumbs.db
 *.swp
 *.swo
 .kiro/
+
+commit-msg.txt
