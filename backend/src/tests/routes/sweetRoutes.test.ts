@@ -1,3 +1,6 @@
+/**
+ * @file Integration-style route tests covering Sweet endpoints.
+ */
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import request from "supertest";
 
@@ -454,7 +457,10 @@ describe("Sweet Routes", () => {
 				updatedAt: new Date(),
 			};
 
-			mockPrisma.sweet.findUnique.mockResolvedValue(existingSweet);
+			// Mock findUnique: first call returns existing sweet (by id), second call returns null (no name conflict)
+			mockPrisma.sweet.findUnique
+				.mockResolvedValueOnce(existingSweet) // First call: check if sweet exists
+				.mockResolvedValueOnce(null); // Second call: check for name conflict
 			mockPrisma.sweet.update.mockResolvedValue(updatedSweet);
 
 			const response = await request(app)
@@ -549,9 +555,10 @@ describe("Sweet Routes", () => {
 				quantity: 100,
 			};
 
+			// Mock findUnique: first call returns existing sweet (by id), second call returns conflicting sweet (name conflict)
 			mockPrisma.sweet.findUnique
-				.mockResolvedValueOnce(existingSweet)
-				.mockResolvedValueOnce(conflictingSweet);
+				.mockResolvedValueOnce(existingSweet) // First call: check if sweet exists
+				.mockResolvedValueOnce(conflictingSweet); // Second call: check for name conflict - found conflict!
 
 			const response = await request(app)
 				.put(`/api/sweets/${sweetId}`)
