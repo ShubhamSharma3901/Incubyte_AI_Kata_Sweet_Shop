@@ -1,8 +1,20 @@
+/**
+ * @file Service encapsulating business logic for user management.
+ */
 import prisma from '../config/database';
 import { hashPassword, comparePassword, generateToken } from '../utils/auth';
 import { CreateUserInput, LoginInput } from '../types';
 
+/**
+ * Provides registration, authentication, and profile retrieval operations.
+ */
 export class UserService {
+    /**
+     * Registers a new user, hashing the password and enforcing unique email.
+     *
+     * @param userData Validated registration payload.
+     * @returns Promise resolving to the persisted user summary.
+     */
     async createUser(userData: CreateUserInput) {
         const existingUser = await prisma.user.findUnique({
             where: { email: userData.email },
@@ -31,6 +43,12 @@ export class UserService {
         return user;
     }
 
+    /**
+     * Authenticates a user and returns a signed token alongside user details.
+     *
+     * @param loginData Login credentials provided by the caller.
+     * @returns Promise resolving to the token and user information.
+     */
     async loginUser(loginData: LoginInput) {
         const user = await prisma.user.findUnique({
             where: { email: loginData.email },
@@ -63,6 +81,12 @@ export class UserService {
         };
     }
 
+    /**
+     * Retrieves a user by identifier, throwing if the user is missing.
+     *
+     * @param id Unique identifier for the user.
+     * @returns Promise resolving to the user's profile information.
+     */
     async getUserById(id: string) {
         const user = await prisma.user.findUnique({
             where: { id },

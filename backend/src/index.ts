@@ -1,3 +1,6 @@
+/**
+ * @file Configures the Express application with middleware and API routes.
+ */
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -9,13 +12,15 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
+/** Attach security, CORS, and body-parsing middleware. */
 app.use(helmet());
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// JSON parsing error handler
+/**
+ * Global handler for malformed JSON payloads to provide a consistent response.
+ */
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction): void => {
     if (err instanceof SyntaxError && 'body' in err) {
         res.status(400).json({
@@ -27,7 +32,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
     next(err);
 });
 
-// Routes
+/** Health-check root endpoint. */
 app.get('/', (req, res) => {
     res.json({ message: 'Sweet Shop API is running!' });
 });
@@ -36,16 +41,18 @@ app.get('/health', (req, res) => {
     res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// API Routes
+/** Mount versioned API routes. */
 app.use('/api', routes);
 
-// Error handling
+/**
+ * Fallback error handler to avoid leaking stack traces.
+ */
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction): void => {
     console.error(err.stack);
     res.status(500).json({ error: 'Something went wrong!' });
 });
 
-// 404 handler
+/** Catch-all handler for unmatched routes. */
 app.use('*', (req, res) => {
     res.status(404).json({ error: 'Route not found' });
 });
