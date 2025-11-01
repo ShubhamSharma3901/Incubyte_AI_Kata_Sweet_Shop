@@ -73,3 +73,22 @@ export const SearchSweetSchema = z
 export type CreateSweetInput = z.infer<typeof CreateSweetSchema>;
 export type UpdateSweetInput = z.infer<typeof UpdateSweetSchema>;
 export type SearchSweetInput = z.infer<typeof SearchSweetSchema>;
+
+/** Validation schema for purchasing inventory. */
+export const PurchaseSweetSchema = z.object({
+	quantity: z.coerce
+		.number()
+		.int()
+		.positive("Purchase quantity must be greater than zero"),
+});
+
+/** Validation schema for restocking inventory. */
+export const RestockSweetSchema = z.object({
+	quantity: z.coerce
+		.number()
+		.int()
+		.positive("Restock quantity must be greater than zero"),
+});
+
+export type PurchaseSweetInput = z.infer<typeof PurchaseSweetSchema>;
+export type RestockSweetInput = z.infer<typeof RestockSweetSchema>;
