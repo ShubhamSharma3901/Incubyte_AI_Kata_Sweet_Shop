@@ -28,21 +28,18 @@ async function main() {
             category: 'Chocolate',
             price: 2.99,
             quantity: 50,
-            description: 'Rich dark chocolate truffle with cocoa powder',
         },
         {
             name: 'Strawberry Gummy',
             category: 'Gummy',
             price: 1.49,
             quantity: 100,
-            description: 'Sweet strawberry flavored gummy candy',
         },
         {
             name: 'Vanilla Fudge',
             category: 'Fudge',
             price: 3.99,
             quantity: 25,
-            description: 'Creamy vanilla fudge made with real vanilla beans',
         },
     ];
 

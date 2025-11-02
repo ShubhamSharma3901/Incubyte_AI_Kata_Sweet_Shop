@@ -65,8 +65,8 @@ export const PurchaseButton: React.FC<PurchaseButtonProps> = ({
     const isOutOfStock = sweet.quantity <= 0;
     const isLowStock = sweet.quantity > 0 && sweet.quantity <= 5;
     const maxQuantity = Math.min(sweet.quantity, 10); // Limit to 10 items per purchase
-    const priceInRupees = sweet.price && !isNaN(sweet.price) ? Math.round(sweet.price * 83) : 0;
-    const totalPrice = priceInRupees * selectedQuantity;
+    const price = sweet.price && !isNaN(sweet.price) ? sweet.price : 0;
+    const totalPrice = price * selectedQuantity;
 
     /**
      * Handle direct purchase without quantity selection
@@ -84,7 +84,7 @@ export const PurchaseButton: React.FC<PurchaseButtonProps> = ({
 
             toast({
                 title: "Purchase successful!",
-                description: `You purchased 1 ${sweet.name} for ₹${priceInRupees}`,
+                description: `You purchased 1 ${sweet.name} for ₹${price}`,
             });
         } catch (error: any) {
             toast({
@@ -212,7 +212,7 @@ export const PurchaseButton: React.FC<PurchaseButtonProps> = ({
                 ) : (
                     <>
                         <IconShoppingCart className="h-4 w-4" />
-                        Buy Now • ₹{priceInRupees}
+                        Buy Now • ₹{price}
                     </>
                 )}
             </Button>
@@ -233,7 +233,7 @@ export const PurchaseButton: React.FC<PurchaseButtonProps> = ({
                     size={size}
                 >
                     <IconShoppingCart className="h-4 w-4" />
-                    Purchase • ₹{priceInRupees}
+                    Purchase • ₹{price}
                     {isLowStock && (
                         <Badge variant="outline" className="ml-2 text-xs">
                             Only {sweet.quantity} left
@@ -242,7 +242,7 @@ export const PurchaseButton: React.FC<PurchaseButtonProps> = ({
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="mx-3 w-[calc(100vw-1.5rem)] max-w-md safe-area-inset sm:mx-auto sm:w-full">
+            <DialogContent className="mx-3 w-[calc(100vw-1.5rem)] max-w-md safe-area-inset sm:mx-auto sm:w-full p-4 xs:p-6">
                 <DialogHeader className="space-y-2">
                     <DialogTitle className="flex items-center gap-2 text-responsive-lg">
                         <IconShoppingCart className="h-4 w-4 xs:h-5 xs:w-5" />
@@ -263,7 +263,7 @@ export const PurchaseButton: React.FC<PurchaseButtonProps> = ({
                     <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30 xs:p-4">
                         <div>
                             <h4 className="font-semibold text-responsive-sm">{sweet.name}</h4>
-                            <p className="text-responsive-xs text-muted-foreground">₹{priceInRupees} per item</p>
+                            <p className="text-responsive-xs text-muted-foreground">₹{price} per item</p>
                         </div>
                         <Badge variant="outline" className="text-xs">
                             {sweet.quantity} in stock
@@ -320,7 +320,7 @@ export const PurchaseButton: React.FC<PurchaseButtonProps> = ({
                     </div>
                 </div>
 
-                <DialogFooter className="flex-col gap-2 xs:flex-row">
+                <DialogFooter className="flex-col gap-2 xs:flex-row pt-4">
                     <Button
                         type="button"
                         variant="outline"

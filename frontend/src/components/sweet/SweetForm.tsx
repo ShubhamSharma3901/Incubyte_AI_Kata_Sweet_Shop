@@ -78,13 +78,11 @@ export const SweetForm: React.FC<SweetFormProps> = ({
         defaultValues: isEditMode ? {
             name: sweet.name,
             category: sweet.category,
-            description: sweet.description || '',
             price: sweet.price,
             quantity: sweet.quantity,
         } : {
             name: '',
             category: '',
-            description: '',
             price: 0,
             quantity: 0,
         }
@@ -102,7 +100,6 @@ export const SweetForm: React.FC<SweetFormProps> = ({
                 const updateData: any = {};
                 if (data.name !== sweet.name) updateData.name = data.name;
                 if (data.category !== sweet.category) updateData.category = data.category;
-                if (data.description !== sweet.description) updateData.description = data.description;
                 if (data.price !== sweet.price) updateData.price = data.price;
                 if (data.quantity !== sweet.quantity) updateData.quantity = data.quantity;
 
@@ -151,7 +148,7 @@ export const SweetForm: React.FC<SweetFormProps> = ({
     };
 
     return (
-        <Card className={`w-full max-w-2xl mx-auto safe-area-inset ${className}`}>
+        <Card className={`w-full max-w-2xl mx-auto safe-area-inset border-none ${className}`}>
             <CardHeader className="space-y-1 p-4 xs:p-6">
                 <CardTitle className="text-responsive-xl font-bold">
                     {isEditMode ? 'Edit Sweet' : 'Add New Sweet'}
@@ -212,29 +209,7 @@ export const SweetForm: React.FC<SweetFormProps> = ({
                         )}
                     </div>
 
-                    {/* Description Field */}
-                    <div className="space-y-2">
-                        <label
-                            htmlFor="description"
-                            className="text-responsive-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                            Description
-                        </label>
-                        <textarea
-                            id="description"
-                            placeholder="Enter description (optional)"
-                            {...register('description')}
-                            className={`flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-responsive-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 xs:min-h-[80px] ${errors.description ? 'border-red-500 focus-visible:ring-red-500' : ''
-                                }`}
-                            disabled={isLoading || isSubmitting}
-                            rows={3}
-                        />
-                        {errors.description && (
-                            <p className="text-responsive-xs text-red-500 mt-1">
-                                {errors.description.message}
-                            </p>
-                        )}
-                    </div>
+
 
                     {/* Price and Quantity Row */}
                     <div className="grid grid-cols-1 gap-4 xs:grid-cols-2">

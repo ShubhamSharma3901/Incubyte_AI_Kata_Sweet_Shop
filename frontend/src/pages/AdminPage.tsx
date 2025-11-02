@@ -130,9 +130,6 @@ export const AdminPage: React.FC = () => {
                                 </Button>
                             </DialogTrigger>
                             <DialogContent className="mx-3 w-[calc(100vw-1.5rem)] max-w-2xl safe-area-inset sm:mx-auto sm:w-full">
-                                <DialogHeader>
-                                    <DialogTitle className="text-responsive-lg">Add New Sweet</DialogTitle>
-                                </DialogHeader>
                                 <SweetForm
                                     onSuccess={handleAddSuccess}
                                     onCancel={() => setShowAddForm(false)}
@@ -154,7 +151,7 @@ export const AdminPage: React.FC = () => {
                         <p className="text-responsive-sm text-muted-foreground mb-4">
                             Add, edit, and remove sweets from your inventory. All changes will be reflected immediately on the dashboard.
                         </p>
-                        <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-3 xs:grid-cols-2">
                             <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
                                 <DialogTrigger asChild>
                                     <Button className="touch-target w-full h-10 xs:h-11" variant="default">
@@ -171,15 +168,6 @@ export const AdminPage: React.FC = () => {
                             >
                                 <IconRefresh className="h-4 w-4 mr-2" />
                                 <span className="text-responsive-sm">Refresh Inventory</span>
-                            </Button>
-                            <Button
-                                className="touch-target w-full h-10 xs:h-11"
-                                variant="outline"
-                                disabled
-                                title="Bulk delete functionality coming soon"
-                            >
-                                <IconTrash className="h-4 w-4 mr-2" />
-                                <span className="text-responsive-sm">Bulk Delete</span>
                             </Button>
                         </div>
                     </CardContent>
@@ -303,9 +291,6 @@ export const AdminPage: React.FC = () => {
             {/* Edit Sweet Dialog */}
             <Dialog open={!!editingSweet} onOpenChange={(open) => !open && setEditingSweet(null)}>
                 <DialogContent className="mx-3 w-[calc(100vw-1.5rem)] max-w-2xl safe-area-inset sm:mx-auto sm:w-full">
-                    <DialogHeader>
-                        <DialogTitle className="text-responsive-lg">Edit Sweet</DialogTitle>
-                    </DialogHeader>
                     {editingSweet && (
                         <SweetForm
                             sweet={editingSweet}
