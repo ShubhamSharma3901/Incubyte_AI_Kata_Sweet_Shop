@@ -2,7 +2,7 @@
 export interface User {
     id: string;
     email: string;
-    username: string;
+    name: string;
     role: 'USER' | 'ADMIN';
     createdAt: string;
 }
@@ -10,10 +10,10 @@ export interface User {
 export interface Sweet {
     id: string;
     name: string;
-    description: string;
+    category: string;
+    description?: string;
     price: number;
     quantity: number;
-    imageUrl?: string;
     createdAt: string;
     updatedAt: string;
 }
@@ -25,7 +25,7 @@ export interface LoginCredentials {
 }
 
 export interface RegisterData {
-    username: string;
+    name: string;
     email: string;
     password: string;
     confirmPassword: string;
@@ -34,13 +34,15 @@ export interface RegisterData {
 // Sweet management form data types
 export interface CreateSweetData {
     name: string;
-    description: string;
+    category: string;
+    description?: string;
     price: number;
     quantity: number;
 }
 
 export interface UpdateSweetData {
     name?: string;
+    category?: string;
     description?: string;
     price?: number;
     quantity?: number;

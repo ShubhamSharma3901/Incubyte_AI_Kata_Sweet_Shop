@@ -85,29 +85,27 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: false,
             isLoading: false,
             error: null,
-
-            // Computed getter for admin status
-            get isAdmin() {
-                return get().user?.role === 'ADMIN';
-            },
+            isAdmin: false,
 
             // Login action
             login: async (credentials: LoginCredentials) => {
                 set({ isLoading: true, error: null });
 
                 try {
-                    const user = await authAPI.login(credentials);
+                    const { user } = await authAPI.login(credentials);
                     set({
                         user,
                         isAuthenticated: true,
+                        isAdmin: user.role === 'ADMIN',
                         isLoading: false,
                         error: null
                     });
                 } catch (error: any) {
-                    const errorMessage = error.response?.data?.message || 'Login failed. Please check your credentials.';
+                    const errorMessage = error.response?.data?.error || 'Login failed. Please check your credentials.';
                     set({
                         user: null,
                         isAuthenticated: false,
+                        isAdmin: false,
                         isLoading: false,
                         error: errorMessage
                     });
@@ -124,14 +122,16 @@ export const useAuthStore = create<AuthState>()(
                     set({
                         user,
                         isAuthenticated: true,
+                        isAdmin: user.role === 'ADMIN',
                         isLoading: false,
                         error: null
                     });
                 } catch (error: any) {
-                    const errorMessage = error.response?.data?.message || 'Registration failed. Please try again.';
+                    const errorMessage = error.response?.data?.error || 'Registration failed. Please try again.';
                     set({
                         user: null,
                         isAuthenticated: false,
+                        isAdmin: false,
                         isLoading: false,
                         error: errorMessage
                     });
@@ -152,6 +152,7 @@ export const useAuthStore = create<AuthState>()(
                     set({
                         user: null,
                         isAuthenticated: false,
+                        isAdmin: false,
                         isLoading: false,
                         error: null
                     });
@@ -160,8 +161,22 @@ export const useAuthStore = create<AuthState>()(
 
             // Check authentication status
             checkAuth: async () => {
-                // Don't check if already loading or if we have a user
+                // Don't check if already loading
                 if (get().isLoading) return;
+
+                // Check if we have a token in localStorage
+                const token = localStorage.getItem('auth-token');
+                if (!token) {
+                    // No token, user is not authenticated
+                    set({
+                        user: null,
+                        isAuthenticated: false,
+                        isAdmin: false,
+                        isLoading: false,
+                        error: null
+                    });
+                    return;
+                }
 
                 set({ isLoading: true, error: null });
 
@@ -170,14 +185,17 @@ export const useAuthStore = create<AuthState>()(
                     set({
                         user,
                         isAuthenticated: true,
+                        isAdmin: user.role === 'ADMIN',
                         isLoading: false,
                         error: null
                     });
                 } catch (error: any) {
                     // If auth check fails, clear the stored session
+                    localStorage.removeItem('auth-token');
                     set({
                         user: null,
                         isAuthenticated: false,
+                        isAdmin: false,
                         isLoading: false,
                         error: null
                     });
@@ -201,9 +219,30 @@ export const useAuthStore = create<AuthState>()(
             partialize: (state) => ({
                 user: state.user,
                 isAuthenticated: state.isAuthenticated,
+                isAdmin: state.isAdmin,
             }),
-            // Skip hydration of loading and error states
-            skipHydration: false,
+            // Handle hydration properly
+            onRehydrateStorage: () => (state) => {
+                // After rehydration, check if we have a valid token
+                if (state?.isAuthenticated) {
+                    const token = localStorage.getItem('auth-token');
+                    if (token) {
+                        // Set the token in axios headers
+                        import('../services/api').then(({ default: api }) => {
+                            api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                        });
+                        // Ensure isAdmin is correctly set based on user role
+                        if (state.user) {
+                            state.isAdmin = state.user.role === 'ADMIN';
+                        }
+                    } else {
+                        // No token found, clear authentication
+                        state.user = null;
+                        state.isAuthenticated = false;
+                        state.isAdmin = false;
+                    }
+                }
+            },
         }
     )
 );

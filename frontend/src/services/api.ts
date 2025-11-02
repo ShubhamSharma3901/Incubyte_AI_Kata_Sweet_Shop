@@ -2,21 +2,31 @@ import axios from 'axios';
 import type { LoginCredentials, RegisterData, User, Sweet, CreateSweetData, UpdateSweetData } from '../types';
 
 /**
- * Base URL for the API, defaults to localhost:3000 if not set in environment
+ * Base URL for the API, defaults to localhost:8000 if not set in environment
  */
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
+// Log the API base URL for debugging (only in development)
+if (import.meta.env.DEV) {
+    console.log('API Base URL:', API_BASE_URL);
+}
 
 /**
  * Axios instance configured for the sweet shop API
- * Includes base URL, cookie-based authentication, and JSON headers
+ * Includes base URL, JWT token authentication, and JSON headers
  */
 const api = axios.create({
     baseURL: API_BASE_URL,
-    withCredentials: true, // For cookie-based auth
     headers: {
         'Content-Type': 'application/json',
     },
 });
+
+// Initialize token from localStorage if available
+const token = localStorage.getItem('auth-token');
+if (token) {
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+}
 
 /**
  * Authentication API methods for user login, registration, and session management
@@ -28,9 +38,19 @@ export const authAPI = {
      * @returns Promise resolving to authenticated user data
      * @throws Error if login fails or credentials are invalid
      */
-    async login(credentials: LoginCredentials): Promise<User> {
-        const response = await api.post('/api/auth/login', credentials);
-        return response.data;
+    async login(credentials: LoginCredentials): Promise<{ user: User; token: string }> {
+        const response = await api.post('/api/users/login', credentials);
+        // Backend returns: { message, token, user }
+        const { token, user } = response.data;
+
+        // Store token in localStorage for subsequent requests
+        if (token) {
+            localStorage.setItem('auth-token', token);
+            // Set default authorization header for future requests
+            api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        }
+
+        return { user, token };
     },
 
     /**
@@ -41,8 +61,9 @@ export const authAPI = {
      */
     async register(userData: RegisterData): Promise<User> {
         const { confirmPassword, ...data } = userData;
-        const response = await api.post('/api/auth/register', data);
-        return response.data;
+        const response = await api.post('/api/users/register', data);
+        // Backend returns: { message, user }
+        return response.data.user;
     },
 
     /**
@@ -51,8 +72,9 @@ export const authAPI = {
      * @throws Error if user is not authenticated or request fails
      */
     async getCurrentUser(): Promise<User> {
-        const response = await api.get('/api/auth/me');
-        return response.data;
+        const response = await api.get('/api/users/profile');
+        // Backend returns: { user }
+        return response.data.user;
     },
 
     /**
@@ -61,7 +83,10 @@ export const authAPI = {
      * @throws Error if logout request fails
      */
     async logout(): Promise<void> {
-        await api.post('/api/auth/logout');
+        // Clear token from localStorage and axios headers
+        localStorage.removeItem('auth-token');
+        delete api.defaults.headers.common['Authorization'];
+        return Promise.resolve();
     },
 };
 
@@ -76,7 +101,8 @@ export const sweetAPI = {
      */
     async getAll(): Promise<Sweet[]> {
         const response = await api.get('/api/sweets');
-        return response.data;
+        console.log(response.data.sweets)
+        return response.data.sweets;
     },
 
     /**
@@ -91,7 +117,7 @@ export const sweetAPI = {
      */
     async search(params: { query?: string; category?: string; minPrice?: number; maxPrice?: number }): Promise<Sweet[]> {
         const response = await api.get('/api/sweets/search', { params });
-        return response.data;
+        return response.data.sweets;
     },
 
     /**
@@ -154,12 +180,16 @@ export const sweetAPI = {
 
 /**
  * Response interceptor for global error handling
- * Automatically redirects to login page on 401 Unauthorized responses
+ * Automatically clears token and redirects to login page on 401 Unauthorized responses
  */
 api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
+            // Clear invalid token
+            localStorage.removeItem('auth-token');
+            delete api.defaults.headers.common['Authorization'];
+
             // Handle unauthorized - redirect to login
             window.location.href = '/login';
         }

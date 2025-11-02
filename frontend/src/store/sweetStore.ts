@@ -4,7 +4,7 @@ import type { Sweet, CreateSweetData, UpdateSweetData, SweetFilters } from '../t
 
 /**
  * Sweet store state interface
- * Manages sweet inventory, search/filtering, and CRUD operations
+ * Manages sweet inventory and CRUD operations
  */
 interface SweetState {
     // State
@@ -18,8 +18,6 @@ interface SweetState {
     searchTerm: string;
     /** Current filters applied to sweet list */
     filters: SweetFilters;
-
-    // Computed getters
     /** Computed array of sweets filtered by search term and filters */
     filteredSweets: Sweet[];
 
@@ -75,6 +73,8 @@ interface SweetState {
     clearFilters: () => void;
     /** Clear current error state */
     clearError: () => void;
+    /** Compute and update filtered sweets */
+    computeFilteredSweets: () => void;
     /**
      * Manually set loading state
      * @param loading - Loading state to set
@@ -114,18 +114,19 @@ export const useSweetStore = create<SweetState>((set, get) => ({
     error: null,
     searchTerm: '',
     filters: {},
+    filteredSweets: [],
 
-    // Computed getter for filtered sweets
-    get filteredSweets() {
+    // Helper function to compute filtered sweets
+    computeFilteredSweets: () => {
         const { sweets, searchTerm, filters } = get();
 
-        return sweets.filter((sweet) => {
+        const filtered = sweets.filter((sweet) => {
             // Search term filter (name and description)
             if (searchTerm) {
                 const searchLower = searchTerm.toLowerCase();
                 const matchesSearch =
                     sweet.name.toLowerCase().includes(searchLower) ||
-                    sweet.description.toLowerCase().includes(searchLower);
+                    (sweet.description && sweet.description.toLowerCase().includes(searchLower));
                 if (!matchesSearch) return false;
             }
 
@@ -144,7 +145,11 @@ export const useSweetStore = create<SweetState>((set, get) => ({
 
             return true;
         });
+
+        set({ filteredSweets: filtered });
     },
+
+
 
     // Fetch all sweets
     fetchSweets: async () => {
@@ -157,6 +162,7 @@ export const useSweetStore = create<SweetState>((set, get) => ({
                 isLoading: false,
                 error: null
             });
+            get().computeFilteredSweets();
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || 'Failed to fetch sweets. Please try again.';
             set({
@@ -304,6 +310,7 @@ export const useSweetStore = create<SweetState>((set, get) => ({
     // Set search term for local filtering
     setSearchTerm: (term: string) => {
         set({ searchTerm: term });
+        get().computeFilteredSweets();
     },
 
     // Set filters for local filtering
@@ -311,6 +318,7 @@ export const useSweetStore = create<SweetState>((set, get) => ({
         set((state) => ({
             filters: { ...state.filters, ...newFilters }
         }));
+        get().computeFilteredSweets();
     },
 
     // Clear all filters and search
@@ -319,6 +327,7 @@ export const useSweetStore = create<SweetState>((set, get) => ({
             searchTerm: '',
             filters: {}
         });
+        get().computeFilteredSweets();
     },
 
     // Clear error state

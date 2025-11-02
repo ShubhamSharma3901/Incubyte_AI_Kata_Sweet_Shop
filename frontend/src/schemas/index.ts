@@ -13,12 +13,11 @@ export const loginSchema = z.object({
 
 export const registerSchema = z
     .object({
-        username: z
+        name: z
             .string()
-            .min(1, 'Username is required')
-            .min(3, 'Username must be at least 3 characters long')
-            .max(50, 'Username must be less than 50 characters')
-            .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
+            .min(1, 'Name is required')
+            .min(2, 'Name must be at least 2 characters long')
+            .max(50, 'Name must be less than 50 characters'),
         email: z
             .email('Please enter a valid email address')
             .min(1, 'Email is required'),
@@ -43,11 +42,16 @@ export const createSweetSchema = z.object({
         .min(1, 'Sweet name is required')
         .min(2, 'Sweet name must be at least 2 characters long')
         .max(100, 'Sweet name must be less than 100 characters'),
+    category: z
+        .string()
+        .min(1, 'Category is required')
+        .min(2, 'Category must be at least 2 characters long')
+        .max(50, 'Category must be less than 50 characters'),
     description: z
         .string()
-        .min(1, 'Description is required')
         .min(10, 'Description must be at least 10 characters long')
-        .max(500, 'Description must be less than 500 characters'),
+        .max(500, 'Description must be less than 500 characters')
+        .optional(),
     price: z
         .number()
         .min(0.01, 'Price must be greater than 0')
@@ -64,6 +68,11 @@ export const updateSweetSchema = z.object({
         .string()
         .min(2, 'Sweet name must be at least 2 characters long')
         .max(100, 'Sweet name must be less than 100 characters')
+        .optional(),
+    category: z
+        .string()
+        .min(2, 'Category must be at least 2 characters long')
+        .max(50, 'Category must be less than 50 characters')
         .optional(),
     description: z
         .string()
