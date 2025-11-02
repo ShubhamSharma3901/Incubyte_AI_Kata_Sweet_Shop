@@ -14,7 +14,33 @@ const PORT = process.env.PORT || 3001;
 
 /** Attach security, CORS, and body-parsing middleware. */
 app.use(helmet());
-app.use(cors());
+
+// Configure CORS for production and development
+const corsOptions = {
+    origin: process.env.NODE_ENV === 'production'
+        ? [process.env.FRONTEND_URL || 'https://your-frontend-app.vercel.app']
+        : [
+            'http://localhost:3000',
+            'http://127.0.0.1:3000',
+        ],
+    credentials: true, // Allow cookies and authorization headers
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'X-Requested-With',
+        'Accept',
+        'Origin',
+        'Access-Control-Allow-Origin'
+    ],
+    optionsSuccessStatus: 200, // Some legacy browsers choke on 204
+};
+
+app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
