@@ -128,7 +128,7 @@ export const sweetAPI = {
      */
     async create(sweetData: CreateSweetData): Promise<Sweet> {
         const response = await api.post('/api/sweets', sweetData);
-        return response.data;
+        return response.data.sweet;
     },
 
     /**
@@ -140,7 +140,7 @@ export const sweetAPI = {
      */
     async update(id: string, sweetData: UpdateSweetData): Promise<Sweet> {
         const response = await api.put(`/api/sweets/${id}`, sweetData);
-        return response.data;
+        return response.data.sweet;
     },
 
     /**
@@ -162,7 +162,7 @@ export const sweetAPI = {
      */
     async purchase(id: string, quantity: number = 1): Promise<Sweet> {
         const response = await api.post(`/api/sweets/${id}/purchase`, { quantity });
-        return response.data;
+        return response.data.sweet;
     },
 
     /**
@@ -174,7 +174,7 @@ export const sweetAPI = {
      */
     async restock(id: string, quantity: number): Promise<Sweet> {
         const response = await api.post(`/api/sweets/${id}/restock`, { quantity });
-        return response.data;
+        return response.data.sweet;
     },
 };
 

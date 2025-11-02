@@ -87,12 +87,13 @@ export const SweetGrid: React.FC<SweetGridProps> = ({
 
     // Main grid display
     return (
-        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ${className}`}>
-            {sweets.map((sweet) => (
+        <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ${className}`}>
+            {sweets.map((sweet, index) => (
                 <SweetCard
                     key={sweet.id}
                     sweet={sweet}
-                    className="animate-in fade-in-50 duration-200"
+                    className={`animate-in fade-in-50 slide-in-from-bottom-4 duration-300`}
+                    style={{ animationDelay: `${index * 50}ms` }}
                 />
             ))}
         </div>
@@ -101,46 +102,42 @@ export const SweetGrid: React.FC<SweetGridProps> = ({
 
 /**
  * Skeleton card component for loading state
- * Mimics the structure of SweetCard with animated placeholders
+ * Mimics the new SweetCard structure with animated placeholders
  */
 const SkeletonCard: React.FC = () => {
     return (
-        <Card className="h-full flex flex-col">
-            <div className="p-6 pb-3">
-                <div className="flex items-start justify-between">
-                    <div className="space-y-2 flex-1">
-                        <div className="h-5 bg-muted rounded animate-pulse" />
-                        <div className="h-4 bg-muted rounded w-3/4 animate-pulse" />
-                    </div>
-                    <div className="ml-4 space-y-1">
-                        <div className="h-6 w-16 bg-muted rounded animate-pulse" />
-                        <div className="h-5 w-12 bg-muted rounded animate-pulse" />
-                    </div>
-                </div>
+        <Card className="h-full flex flex-col overflow-hidden border border-border bg-card">
+            <div className="p-6 space-y-4">
+                {/* Category badge skeleton */}
+                <div className="h-6 w-20 bg-muted rounded-full animate-pulse" />
+
+                {/* Title skeleton */}
+                <div className="h-6 bg-muted rounded animate-pulse" />
             </div>
 
-            <div className="px-6 pb-3 flex-1">
-                <div className="space-y-3">
-                    <div className="space-y-2">
-                        <div className="h-3 bg-muted rounded animate-pulse" />
-                        <div className="h-3 bg-muted rounded w-5/6 animate-pulse" />
-                        <div className="h-3 bg-muted rounded w-4/6 animate-pulse" />
-                    </div>
-
+            <div className="px-6 pb-4 space-y-3">
+                {/* Price section skeleton */}
+                <div className="p-4 rounded-xl border border-border bg-muted/30">
                     <div className="flex items-center justify-between">
-                        <div className="h-4 w-16 bg-muted rounded animate-pulse" />
-                        <div className="h-5 w-20 bg-muted rounded animate-pulse" />
+                        <div className="h-3 w-8 bg-muted rounded animate-pulse" />
+                        <div className="h-6 w-16 bg-muted rounded animate-pulse" />
                     </div>
+                </div>
 
+                {/* Stock section skeleton */}
+                <div className="p-4 rounded-xl border border-border bg-muted/30">
                     <div className="flex items-center justify-between">
-                        <div className="h-4 w-16 bg-muted rounded animate-pulse" />
+                        <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 bg-muted rounded-full animate-pulse" />
+                            <div className="h-4 w-16 bg-muted rounded animate-pulse" />
+                        </div>
                         <div className="h-4 w-12 bg-muted rounded animate-pulse" />
                     </div>
                 </div>
             </div>
 
-            <div className="p-6 pt-0">
-                <div className="h-10 bg-muted rounded animate-pulse" />
+            <div className="p-6 pt-2">
+                <div className="h-12 bg-gray-200 rounded-2xl animate-pulse" />
             </div>
         </Card>
     );

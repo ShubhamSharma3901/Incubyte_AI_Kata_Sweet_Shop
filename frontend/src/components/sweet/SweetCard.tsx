@@ -1,192 +1,166 @@
-import React from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '../ui/badge';
-import { useSweetStore } from '@/store/sweetStore';
-import { useAuthStore } from '@/store/authStore';
-import { useToast } from '@/hooks/use-toast';
-import type { Sweet } from '@/types';
+import React from "react";
+import {
+	Card,
+	CardContent,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { PurchaseButton } from "./PurchaseButton";
+import { useSweetStore } from "@/store/sweetStore";
+import { useAuthStore } from "@/store/authStore";
+import { useToast } from "@/hooks/use-toast";
+import {
+	IconEdit,
+	IconTrash,
+	IconPackage,
+	IconTrendingUp
+} from "@tabler/icons-react";
+import { cn } from "@/lib/utils";
+import type { Sweet } from "@/types";
 
 interface SweetCardProps {
-    /** Sweet data to display */
-    sweet: Sweet;
-    /** Optional className for styling */
-    className?: string;
+	sweet: Sweet;
+	className?: string;
+	style?: React.CSSProperties;
 }
 
-/**
- * SweetCard component displays individual sweet information
- * Shows name, description, price, quantity and purchase/admin actions
- * 
- * Features:
- * - Responsive card layout
- * - Purchase functionality for customers
- * - Admin actions (edit/delete) for admin users
- * - Out of stock handling
- * - Loading states during actions
- * 
- * @param sweet - Sweet data to display
- * @param className - Optional CSS classes
- */
-export const SweetCard: React.FC<SweetCardProps> = ({ sweet, className }) => {
-    const { purchaseSweet, deleteSweet, isLoading } = useSweetStore();
-    const { user, isAdmin } = useAuthStore();
-    const { toast } = useToast();
+export const SweetCard: React.FC<SweetCardProps> = ({ sweet, className, style }) => {
+	const { deleteSweet, isLoading } = useSweetStore();
+	const { user, isAdmin } = useAuthStore();
+	const { toast } = useToast();
 
-    /**
-     * Handle sweet purchase
-     * Shows success/error toast messages
-     */
-    const handlePurchase = async () => {
-        try {
-            await purchaseSweet(sweet.id, 1);
-            toast({
-                title: "Purchase Successful!",
-                description: `You purchased 1 ${sweet.name}`,
-            });
-        } catch (error: any) {
-            toast({
-                title: "Purchase Failed",
-                description: error.response?.data?.message || "Failed to purchase sweet. Please try again.",
-                variant: "destructive",
-            });
-        }
-    };
+	const isOutOfStock = sweet.quantity <= 0;
+	const isLowStock = sweet.quantity > 0 && sweet.quantity <= 5;
+	const priceInRupees = sweet.price && !isNaN(sweet.price) ? sweet.price : 0;
 
-    /**
-     * Handle sweet deletion (admin only)
-     * Shows confirmation and success/error messages
-     */
-    const handleDelete = async () => {
-        if (!window.confirm(`Are you sure you want to delete "${sweet.name}"?`)) {
-            return;
-        }
+	const handleDelete = async () => {
+		if (!window.confirm(`Delete \"${sweet.name}\"?`)) {
+			return;
+		}
 
-        try {
-            await deleteSweet(sweet.id);
-            toast({
-                title: "Sweet Deleted",
-                description: `${sweet.name} has been removed from inventory`,
-            });
-        } catch (error: any) {
-            toast({
-                title: "Delete Failed",
-                description: error.response?.data?.message || "Failed to delete sweet. Please try again.",
-                variant: "destructive",
-            });
-        }
-    };
+		try {
+			await deleteSweet(sweet.id);
+			toast({
+				title: "Sweet removed",
+				description: `${sweet.name} has been deleted from inventory`,
+			});
+		} catch (error: any) {
+			toast({
+				title: "Delete failed",
+				description:
+					error.response?.data?.message ??
+					"Failed to delete sweet. Please try again.",
+				variant: "destructive",
+			});
+		}
+	};
 
-    const isOutOfStock = sweet.quantity <= 0;
-    const isLowStock = sweet.quantity > 0 && sweet.quantity <= 5;
+	return (
+		<Card
+			className={cn(
+				"group relative flex h-full flex-col overflow-hidden border border-border bg-card",
+				"shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1",
+				className
+			)}
+			style={style}
+		>
+			{/* Trending badge for popular items */}
+			{sweet.quantity < 10 && (
+				<div className="absolute top-4 right-4 z-10">
+					<Badge variant="secondary" className="text-xs font-medium">
+						<IconTrendingUp className="h-3 w-3 mr-1" />
+						Popular
+					</Badge>
+				</div>
+			)}
 
-    return (
-        <Card className={`h-full flex flex-col transition-all duration-200 hover:shadow-lg ${className}`}>
-            <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg font-semibold line-clamp-2">
-                        {sweet.name}
-                    </CardTitle>
-                    <div className="flex flex-col items-end gap-1">
-                        <span className="text-xl font-bold text-primary">
-                            ${sweet.price.toFixed(2)}
-                        </span>
-                        {isOutOfStock ? (
-                            <Badge variant="destructive" className="text-xs">
-                                Out of Stock
-                            </Badge>
-                        ) : isLowStock ? (
-                            <Badge variant="secondary" className="text-xs">
-                                Low Stock
-                            </Badge>
-                        ) : (
-                            <Badge variant="outline" className="text-xs">
-                                In Stock
-                            </Badge>
-                        )}
-                    </div>
-                </div>
-            </CardHeader>
+			<CardHeader className="space-y-4 pb-4 pt-6">
+				<Badge
+					variant="outline"
+					className="w-fit rounded-full px-3 py-1.5 text-xs font-medium capitalize"
+				>
+					{sweet.category}
+				</Badge>
 
-            <CardContent className="flex-1 pb-3">
-                <div className="space-y-3">
-                    {sweet.description && (
-                        <p className="text-sm text-muted-foreground line-clamp-3">
-                            {sweet.description}
-                        </p>
-                    )}
+				<CardTitle className="text-xl font-bold text-foreground leading-tight">
+					{sweet.name}
+				</CardTitle>
+			</CardHeader>
 
-                    <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Category:</span>
-                        <Badge variant="outline" className="text-xs">
-                            {sweet.category}
-                        </Badge>
-                    </div>
+			<CardContent className="flex flex-col gap-4 pb-5">
+				{/* Price section */}
+				<div className="flex items-center justify-between p-4 rounded-xl border border-border bg-muted/30">
+					<span className="text-xs text-muted-foreground font-medium">Price</span>
+					<span className="text-2xl font-bold text-foreground">
+						₹{priceInRupees}
+					</span>
+				</div>
 
-                    <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Available:</span>
-                        <span className={`font-medium ${isOutOfStock ? 'text-destructive' : isLowStock ? 'text-orange-600' : 'text-green-600'}`}>
-                            {sweet.quantity} units
-                        </span>
-                    </div>
-                </div>
-            </CardContent>
+				{/* Stock status */}
+				<div className="flex items-center justify-between p-4 rounded-xl border border-border bg-muted/30">
+					<div className="flex items-center gap-3">
+						<div className={cn(
+							"w-3 h-3 rounded-full",
+							isOutOfStock ? "bg-red-500" : isLowStock ? "bg-orange-500" : "bg-green-500"
+						)} />
+						<span className="text-sm font-medium text-foreground">
+							{isOutOfStock ? "Out of Stock" : isLowStock ? "Low Stock" : "In Stock"}
+						</span>
+					</div>
+					<div className="flex items-center gap-2">
+						<IconPackage className="h-4 w-4 text-muted-foreground" />
+						<span className="text-sm font-semibold text-foreground">
+							{sweet.quantity} units
+						</span>
+					</div>
+				</div>
+			</CardContent>
 
-            <CardFooter className="pt-0 flex flex-col gap-2">
-                {/* Customer purchase button */}
-                {user && !isAdmin && (
-                    <Button
-                        onClick={handlePurchase}
-                        disabled={isOutOfStock || isLoading}
-                        className="w-full"
-                        variant={isOutOfStock ? "secondary" : "default"}
-                    >
-                        {isLoading ? (
-                            <div className="flex items-center gap-2">
-                                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                                Processing...
-                            </div>
-                        ) : isOutOfStock ? (
-                            "Out of Stock"
-                        ) : (
-                            `Purchase - $${sweet.price.toFixed(2)}`
-                        )}
-                    </Button>
-                )}
+			<CardFooter className="flex flex-col gap-3 pb-6 pt-2">
+				{user && !isAdmin && (
+					<PurchaseButton
+						sweet={sweet}
+						className="h-12 w-full rounded-xl text-sm font-semibold"
+						showQuantitySelector={true}
+					/>
+				)}
 
-                {/* Admin actions */}
-                {isAdmin && (
-                    <div className="flex gap-2 w-full">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1"
-                            onClick={() => {
-                                // TODO: Implement edit functionality in future task
-                                toast({
-                                    title: "Edit Feature",
-                                    description: "Edit functionality will be implemented in a future update",
-                                });
-                            }}
-                        >
-                            Edit
-                        </Button>
-                        <Button
-                            variant="destructive"
-                            size="sm"
-                            className="flex-1"
-                            onClick={handleDelete}
-                            disabled={isLoading}
-                        >
-                            {isLoading ? (
-                                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                                "Delete"
-                            )}
-                        </Button>
-                    </div>
-                )}
-            </CardFooter>
-        </Card>
-    );
+				{isAdmin && (
+					<div className="flex w-full gap-3">
+						<Button
+							variant="outline"
+							onClick={() =>
+								toast({
+									title: "Edit coming soon",
+									description: "Editing sweets will be available in a future release.",
+								})
+							}
+							className="flex-1 h-10 rounded-xl"
+						>
+							<IconEdit className="mr-2 h-4 w-4" />
+							Edit
+						</Button>
+						<Button
+							variant="destructive"
+							onClick={handleDelete}
+							className="flex-1 h-10 rounded-xl"
+							disabled={isLoading}
+						>
+							{isLoading ? (
+								<span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+							) : (
+								<>
+									<IconTrash className="mr-2 h-4 w-4" />
+									Delete
+								</>
+							)}
+						</Button>
+					</div>
+				)}
+			</CardFooter>
+		</Card>
+	);
 };

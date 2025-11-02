@@ -178,7 +178,7 @@ export const SweetFilters: React.FC = () => {
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
                                     <label className="text-xs text-muted-foreground mb-1 block">
-                                        Min Price ($)
+                                        Min Price (₹)
                                     </label>
                                     <Input
                                         type="number"
@@ -191,7 +191,7 @@ export const SweetFilters: React.FC = () => {
                                 </div>
                                 <div>
                                     <label className="text-xs text-muted-foreground mb-1 block">
-                                        Max Price ($)
+                                        Max Price (₹)
                                     </label>
                                     <Input
                                         type="number"
@@ -244,12 +244,12 @@ export const SweetFilters: React.FC = () => {
                             )}
                             {filters.minPrice !== undefined && (
                                 <Badge variant="secondary" className="text-xs">
-                                    Min: ${filters.minPrice}
+                                    Min: ₹{filters.minPrice}
                                 </Badge>
                             )}
                             {filters.maxPrice !== undefined && (
                                 <Badge variant="secondary" className="text-xs">
-                                    Max: ${filters.maxPrice}
+                                    Max: ₹{filters.maxPrice}
                                 </Badge>
                             )}
                             {filters.inStock && (

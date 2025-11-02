@@ -229,6 +229,8 @@ export const useSweetStore = create<SweetState>((set, get) => ({
                 isLoading: false,
                 error: null
             }));
+            // Update filtered sweets to reflect real-time changes
+            get().computeFilteredSweets();
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || 'Failed to delete sweet. Please try again.';
             set({
@@ -245,6 +247,13 @@ export const useSweetStore = create<SweetState>((set, get) => ({
 
         try {
             const updatedSweet = await sweetAPI.purchase(id, quantity);
+
+            // Validate the updated sweet data
+            if (!updatedSweet || typeof updatedSweet.price !== 'number' || isNaN(updatedSweet.price)) {
+                console.error('Invalid sweet data received from API:', updatedSweet);
+                throw new Error('Invalid sweet data received from server');
+            }
+
             set((state) => ({
                 sweets: state.sweets.map(sweet =>
                     sweet.id === id ? updatedSweet : sweet
@@ -252,6 +261,8 @@ export const useSweetStore = create<SweetState>((set, get) => ({
                 isLoading: false,
                 error: null
             }));
+            // Update filtered sweets to reflect real-time changes
+            get().computeFilteredSweets();
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || 'Failed to purchase sweet. Please try again.';
             set({
