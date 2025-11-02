@@ -82,20 +82,21 @@ export const SweetsPage: React.FC = () => {
                         variant="outline"
                         onClick={handleRefresh}
                         disabled={isLoading}
+                        className="touch-target w-full xs:w-auto"
                     >
                         {isLoading ? (
                             <div className="flex items-center gap-2">
                                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                                Loading...
+                                <span className="text-responsive-sm">Loading...</span>
                             </div>
                         ) : (
-                            "Refresh"
+                            <span className="text-responsive-sm">Refresh</span>
                         )}
                     </Button>
                 }
             />
 
-            <div className="space-y-6">
+            <div className="space-responsive">
                 {/* Search and Filters */}
                 <SweetFilters />
 

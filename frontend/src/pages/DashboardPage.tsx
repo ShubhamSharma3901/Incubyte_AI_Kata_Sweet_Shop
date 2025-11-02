@@ -130,7 +130,7 @@ export const DashboardPage: React.FC = () => {
             />
 
             {/* Statistics Cards */}
-            <DashboardGrid cols={4}>
+            <div className="grid-responsive-stats">
                 <StatsCard
                     title="Total Sweets"
                     value={stats.totalSweets}
@@ -155,14 +155,14 @@ export const DashboardPage: React.FC = () => {
                     description="Need restocking"
                     icon={<IconX className="h-4 w-4 text-red-500" />}
                 />
-            </DashboardGrid>
+            </div>
 
 
 
             {/* Sweet Inventory Section */}
-            <div className="space-y-6">
+            <div className="space-responsive">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-bold">Sweet Inventory</h2>
+                    <h2 className="text-responsive-xl font-bold">Sweet Inventory</h2>
                 </div>
 
                 {/* Search and Filters */}

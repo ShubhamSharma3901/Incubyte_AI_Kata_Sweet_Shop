@@ -1,111 +1,38 @@
 import { create } from 'zustand';
 import { sweetAPI } from '../services/api';
+import { showErrorToast, showSuccessToast, getErrorMessage } from '../utils/errorHandling';
 import type { Sweet, CreateSweetData, UpdateSweetData, SweetFilters } from '../types';
 
 /**
  * Sweet store state interface
- * Manages sweet inventory and CRUD operations
  */
 interface SweetState {
     // State
-    /** Array of all sweets in the inventory */
     sweets: Sweet[];
-    /** Loading state for sweet operations */
     isLoading: boolean;
-    /** Current error message from sweet operations, null if no error */
     error: string | null;
-    /** Current search term for local filtering */
     searchTerm: string;
-    /** Current filters applied to sweet list */
     filters: SweetFilters;
-    /** Computed array of sweets filtered by search term and filters */
     filteredSweets: Sweet[];
 
     // Actions
-    /** Fetch all sweets from the server */
     fetchSweets: () => Promise<void>;
-    /**
-     * Add a new sweet to inventory (admin only)
-     * @param sweetData - Sweet creation data
-     */
     addSweet: (sweetData: CreateSweetData) => Promise<void>;
-    /**
-     * Update an existing sweet (admin only)
-     * @param id - Sweet ID to update
-     * @param sweetData - Partial sweet data to update
-     */
     updateSweet: (id: string, sweetData: UpdateSweetData) => Promise<void>;
-    /**
-     * Delete a sweet from inventory (admin only)
-     * @param id - Sweet ID to delete
-     */
     deleteSweet: (id: string) => Promise<void>;
-    /**
-     * Purchase a sweet, reducing its quantity
-     * @param id - Sweet ID to purchase
-     * @param quantity - Number of items to purchase (defaults to 1)
-     */
     purchaseSweet: (id: string, quantity?: number) => Promise<void>;
-    /**
-     * Restock a sweet, increasing its quantity (admin only)
-     * @param id - Sweet ID to restock
-     * @param quantity - Number of items to add to inventory
-     */
     restockSweet: (id: string, quantity: number) => Promise<void>;
-    /**
-     * Search sweets with server-side filtering
-     * @param params - Search parameters including query, category, and price range
-     */
     searchSweets: (params: { query?: string; category?: string; minPrice?: number; maxPrice?: number }) => Promise<void>;
-
-    // Filter and search actions
-    /**
-     * Set search term for local filtering
-     * @param term - Search term to filter by name and description
-     */
     setSearchTerm: (term: string) => void;
-    /**
-     * Set filters for local filtering
-     * @param filters - Partial filters to apply
-     */
     setFilters: (filters: Partial<SweetFilters>) => void;
-    /** Clear all filters and search term */
     clearFilters: () => void;
-    /** Clear current error state */
     clearError: () => void;
-    /** Compute and update filtered sweets */
     computeFilteredSweets: () => void;
-    /**
-     * Manually set loading state
-     * @param loading - Loading state to set
-     */
     setLoading: (loading: boolean) => void;
 }
 
 /**
  * Zustand store for sweet inventory management
- * 
- * Features:
- * - CRUD operations for sweet inventory
- * - Real-time search and filtering
- * - Purchase and restock functionality
- * - Computed filtered results
- * - Error handling and loading states
- * 
- * @example
- * ```tsx
- * const { sweets, fetchSweets, purchaseSweet, filteredSweets } = useSweetStore();
- * 
- * // Fetch all sweets
- * await fetchSweets();
- * 
- * // Purchase a sweet
- * await purchaseSweet('sweet-id', 2);
- * 
- * // Filter sweets
- * setSearchTerm('chocolate');
- * setFilters({ minPrice: 5, maxPrice: 20 });
- * ```
  */
 export const useSweetStore = create<SweetState>((set, get) => ({
     // Initial state
@@ -149,8 +76,6 @@ export const useSweetStore = create<SweetState>((set, get) => ({
         set({ filteredSweets: filtered });
     },
 
-
-
     // Fetch all sweets
     fetchSweets: async () => {
         set({ isLoading: true, error: null });
@@ -164,12 +89,13 @@ export const useSweetStore = create<SweetState>((set, get) => ({
             });
             get().computeFilteredSweets();
         } catch (error: any) {
-            const errorMessage = error.response?.data?.message || 'Failed to fetch sweets. Please try again.';
+            const errorMessage = getErrorMessage(error);
             set({
                 sweets: [],
                 isLoading: false,
                 error: errorMessage
             });
+            showErrorToast('Failed to load sweets', errorMessage);
             throw error;
         }
     },
@@ -185,12 +111,16 @@ export const useSweetStore = create<SweetState>((set, get) => ({
                 isLoading: false,
                 error: null
             }));
+            get().computeFilteredSweets();
+
+            showSuccessToast('Sweet Added', `${newSweet.name} has been added to the inventory.`);
         } catch (error: any) {
-            const errorMessage = error.response?.data?.message || 'Failed to add sweet. Please try again.';
+            const errorMessage = getErrorMessage(error);
             set({
                 isLoading: false,
                 error: errorMessage
             });
+            showErrorToast('Failed to add sweet', errorMessage);
             throw error;
         }
     },
@@ -208,12 +138,16 @@ export const useSweetStore = create<SweetState>((set, get) => ({
                 isLoading: false,
                 error: null
             }));
+            get().computeFilteredSweets();
+
+            showSuccessToast('Sweet Updated', `${updatedSweet.name} has been updated successfully.`);
         } catch (error: any) {
-            const errorMessage = error.response?.data?.message || 'Failed to update sweet. Please try again.';
+            const errorMessage = getErrorMessage(error);
             set({
                 isLoading: false,
                 error: errorMessage
             });
+            showErrorToast('Failed to update sweet', errorMessage);
             throw error;
         }
     },
@@ -222,6 +156,9 @@ export const useSweetStore = create<SweetState>((set, get) => ({
     deleteSweet: async (id: string) => {
         set({ isLoading: true, error: null });
 
+        const sweetToDelete = get().sweets.find(sweet => sweet.id === id);
+        const sweetName = sweetToDelete?.name || 'Sweet';
+
         try {
             await sweetAPI.delete(id);
             set((state) => ({
@@ -229,14 +166,16 @@ export const useSweetStore = create<SweetState>((set, get) => ({
                 isLoading: false,
                 error: null
             }));
-            // Update filtered sweets to reflect real-time changes
             get().computeFilteredSweets();
+
+            showSuccessToast('Sweet Deleted', `${sweetName} has been removed from the inventory.`);
         } catch (error: any) {
-            const errorMessage = error.response?.data?.message || 'Failed to delete sweet. Please try again.';
+            const errorMessage = getErrorMessage(error);
             set({
                 isLoading: false,
                 error: errorMessage
             });
+            showErrorToast('Failed to delete sweet', errorMessage);
             throw error;
         }
     },
@@ -245,10 +184,12 @@ export const useSweetStore = create<SweetState>((set, get) => ({
     purchaseSweet: async (id: string, quantity: number = 1) => {
         set({ isLoading: true, error: null });
 
+        const sweetToPurchase = get().sweets.find(sweet => sweet.id === id);
+        const sweetName = sweetToPurchase?.name || 'Sweet';
+
         try {
             const updatedSweet = await sweetAPI.purchase(id, quantity);
 
-            // Validate the updated sweet data
             if (!updatedSweet || typeof updatedSweet.price !== 'number' || isNaN(updatedSweet.price)) {
                 console.error('Invalid sweet data received from API:', updatedSweet);
                 throw new Error('Invalid sweet data received from server');
@@ -261,14 +202,16 @@ export const useSweetStore = create<SweetState>((set, get) => ({
                 isLoading: false,
                 error: null
             }));
-            // Update filtered sweets to reflect real-time changes
             get().computeFilteredSweets();
+
+            showSuccessToast('Purchase Successful', `You purchased ${quantity} ${sweetName}${quantity > 1 ? 's' : ''}!`);
         } catch (error: any) {
-            const errorMessage = error.response?.data?.message || 'Failed to purchase sweet. Please try again.';
+            const errorMessage = getErrorMessage(error);
             set({
                 isLoading: false,
                 error: errorMessage
             });
+            showErrorToast('Failed to purchase sweet', errorMessage);
             throw error;
         }
     },
@@ -286,12 +229,16 @@ export const useSweetStore = create<SweetState>((set, get) => ({
                 isLoading: false,
                 error: null
             }));
+            get().computeFilteredSweets();
+
+            showSuccessToast('Sweet Restocked', `${updatedSweet.name} has been restocked.`);
         } catch (error: any) {
-            const errorMessage = error.response?.data?.message || 'Failed to restock sweet. Please try again.';
+            const errorMessage = getErrorMessage(error);
             set({
                 isLoading: false,
                 error: errorMessage
             });
+            showErrorToast('Failed to restock sweet', errorMessage);
             throw error;
         }
     },
@@ -307,13 +254,15 @@ export const useSweetStore = create<SweetState>((set, get) => ({
                 isLoading: false,
                 error: null
             });
+            get().computeFilteredSweets();
         } catch (error: any) {
-            const errorMessage = error.response?.data?.message || 'Search failed. Please try again.';
+            const errorMessage = getErrorMessage(error);
             set({
                 sweets: [],
                 isLoading: false,
                 error: errorMessage
             });
+            showErrorToast('Search failed', errorMessage);
             throw error;
         }
     },

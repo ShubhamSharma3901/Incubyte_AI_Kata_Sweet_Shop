@@ -151,12 +151,12 @@ export const SweetForm: React.FC<SweetFormProps> = ({
     };
 
     return (
-        <Card className={`w-full max-w-2xl mx-auto ${className}`}>
-            <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl font-bold">
+        <Card className={`w-full max-w-2xl mx-auto safe-area-inset ${className}`}>
+            <CardHeader className="space-y-1 p-4 xs:p-6">
+                <CardTitle className="text-responsive-xl font-bold">
                     {isEditMode ? 'Edit Sweet' : 'Add New Sweet'}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-responsive-sm">
                     {isEditMode
                         ? 'Update the sweet information below'
                         : 'Fill in the details to add a new sweet to your inventory'
@@ -165,25 +165,25 @@ export const SweetForm: React.FC<SweetFormProps> = ({
             </CardHeader>
 
             <form onSubmit={handleSubmit(onSubmit)}>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-4 p-4 xs:space-y-6 xs:p-6">
                     {/* Name Field */}
                     <div className="space-y-2">
                         <label
                             htmlFor="name"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            className="text-responsive-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                             Sweet Name *
                         </label>
                         <Input
                             id="name"
                             type="text"
-                            placeholder="Enter sweet name (e.g., Chocolate Chip Cookie)"
+                            placeholder="Enter sweet name"
                             {...register('name')}
-                            className={errors.name ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                            className={`h-10 xs:h-11 ${errors.name ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                             disabled={isLoading || isSubmitting}
                         />
                         {errors.name && (
-                            <p className="text-sm text-red-500 mt-1">
+                            <p className="text-responsive-xs text-red-500 mt-1">
                                 {errors.name.message}
                             </p>
                         )}
@@ -193,20 +193,20 @@ export const SweetForm: React.FC<SweetFormProps> = ({
                     <div className="space-y-2">
                         <label
                             htmlFor="category"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            className="text-responsive-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                             Category *
                         </label>
                         <Input
                             id="category"
                             type="text"
-                            placeholder="Enter category (e.g., Cookies, Candies, Chocolates)"
+                            placeholder="Enter category"
                             {...register('category')}
-                            className={errors.category ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                            className={`h-10 xs:h-11 ${errors.category ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                             disabled={isLoading || isSubmitting}
                         />
                         {errors.category && (
-                            <p className="text-sm text-red-500 mt-1">
+                            <p className="text-responsive-xs text-red-500 mt-1">
                                 {errors.category.message}
                             </p>
                         )}
@@ -216,33 +216,33 @@ export const SweetForm: React.FC<SweetFormProps> = ({
                     <div className="space-y-2">
                         <label
                             htmlFor="description"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            className="text-responsive-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                             Description
                         </label>
                         <textarea
                             id="description"
-                            placeholder="Enter a detailed description of the sweet (optional)"
+                            placeholder="Enter description (optional)"
                             {...register('description')}
-                            className={`flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${errors.description ? 'border-red-500 focus-visible:ring-red-500' : ''
+                            className={`flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-responsive-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 xs:min-h-[80px] ${errors.description ? 'border-red-500 focus-visible:ring-red-500' : ''
                                 }`}
                             disabled={isLoading || isSubmitting}
                             rows={3}
                         />
                         {errors.description && (
-                            <p className="text-sm text-red-500 mt-1">
+                            <p className="text-responsive-xs text-red-500 mt-1">
                                 {errors.description.message}
                             </p>
                         )}
                     </div>
 
                     {/* Price and Quantity Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 xs:grid-cols-2">
                         {/* Price Field */}
                         <div className="space-y-2">
                             <label
                                 htmlFor="price"
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                className="text-responsive-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                             >
                                 Price (₹) *
                             </label>
@@ -257,11 +257,11 @@ export const SweetForm: React.FC<SweetFormProps> = ({
                                     valueAsNumber: true,
                                     setValueAs: (value) => value === '' ? undefined : parseFloat(value)
                                 })}
-                                className={errors.price ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                                className={`h-10 xs:h-11 ${errors.price ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                                 disabled={isLoading || isSubmitting}
                             />
                             {errors.price && (
-                                <p className="text-sm text-red-500 mt-1">
+                                <p className="text-responsive-xs text-red-500 mt-1">
                                     {errors.price.message}
                                 </p>
                             )}
@@ -271,7 +271,7 @@ export const SweetForm: React.FC<SweetFormProps> = ({
                         <div className="space-y-2">
                             <label
                                 htmlFor="quantity"
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                className="text-responsive-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                             >
                                 Quantity in Stock *
                             </label>
@@ -285,11 +285,11 @@ export const SweetForm: React.FC<SweetFormProps> = ({
                                     valueAsNumber: true,
                                     setValueAs: (value) => value === '' ? undefined : parseInt(value, 10)
                                 })}
-                                className={errors.quantity ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                                className={`h-10 xs:h-11 ${errors.quantity ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                                 disabled={isLoading || isSubmitting}
                             />
                             {errors.quantity && (
-                                <p className="text-sm text-red-500 mt-1">
+                                <p className="text-responsive-xs text-red-500 mt-1">
                                     {errors.quantity.message}
                                 </p>
                             )}
@@ -297,10 +297,10 @@ export const SweetForm: React.FC<SweetFormProps> = ({
                     </div>
                 </CardContent>
 
-                <CardFooter className="flex flex-col sm:flex-row gap-3">
+                <CardFooter className="flex flex-col gap-2 p-4 xs:gap-3 xs:p-6 sm:flex-row">
                     <Button
                         type="submit"
-                        className="w-full sm:w-auto"
+                        className="touch-target w-full h-10 xs:h-11 sm:w-auto"
                         disabled={isLoading || isSubmitting}
                     >
                         {isLoading || isSubmitting
@@ -313,7 +313,7 @@ export const SweetForm: React.FC<SweetFormProps> = ({
                         <Button
                             type="button"
                             variant="outline"
-                            className="w-full sm:w-auto"
+                            className="touch-target w-full h-10 xs:h-11 sm:w-auto"
                             onClick={handleCancel}
                             disabled={isLoading || isSubmitting}
                         >

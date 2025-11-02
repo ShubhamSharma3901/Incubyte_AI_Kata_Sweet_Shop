@@ -86,13 +86,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             // Attempt to register the user
             await registerUser(data);
 
-            // Show success message
-            toast({
-                title: 'Registration Successful',
-                description: 'Your account has been created successfully. Welcome to Sweet Shop!',
-                variant: 'success',
-            });
-
             // Reset form
             reset();
 
@@ -102,33 +95,29 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             // Navigate to dashboard
             navigate('/dashboard');
         } catch (error: any) {
-            // Error is already handled by the auth store and displayed via toast
-            toast({
-                title: 'Registration Failed',
-                description: error.response?.data?.message || 'Failed to create account. Please try again.',
-                variant: 'destructive',
-            });
+            // Error handling is now done in the auth store
+            console.error('Registration error:', error);
         }
     };
 
     return (
-        <Card className={`w-full max-w-md mx-auto ${className}`}>
-            <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl font-bold text-center">
+        <Card className={`w-full max-w-md mx-auto safe-area-inset ${className}`}>
+            <CardHeader className="space-y-1 p-4 xs:p-6">
+                <CardTitle className="text-responsive-xl font-bold text-center">
                     Create Account
                 </CardTitle>
-                <CardDescription className="text-center">
+                <CardDescription className="text-center text-responsive-sm">
                     Enter your information to create a new account
                 </CardDescription>
             </CardHeader>
 
             <form onSubmit={handleSubmit(onSubmit)}>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3 p-4 xs:space-y-4 xs:p-6">
                     {/* Name Field */}
                     <div className="space-y-2">
                         <label
                             htmlFor="name"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            className="text-responsive-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                             Name
                         </label>
@@ -137,11 +126,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                             type="text"
                             placeholder="Enter your name"
                             {...register('name')}
-                            className={errors.name ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                            className={`h-10 xs:h-11 ${errors.name ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                             disabled={isLoading || isSubmitting}
                         />
                         {errors.name && (
-                            <p className="text-sm text-red-500 mt-1">
+                            <p className="text-responsive-xs text-red-500 mt-1">
                                 {errors.name.message}
                             </p>
                         )}
@@ -151,7 +140,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                     <div className="space-y-2">
                         <label
                             htmlFor="email"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            className="text-responsive-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                             Email
                         </label>
@@ -160,11 +149,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                             type="email"
                             placeholder="Enter your email"
                             {...register('email')}
-                            className={errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                            className={`h-10 xs:h-11 ${errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                             disabled={isLoading || isSubmitting}
                         />
                         {errors.email && (
-                            <p className="text-sm text-red-500 mt-1">
+                            <p className="text-responsive-xs text-red-500 mt-1">
                                 {errors.email.message}
                             </p>
                         )}
@@ -174,7 +163,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                     <div className="space-y-2">
                         <label
                             htmlFor="password"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            className="text-responsive-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                             Password
                         </label>
@@ -183,11 +172,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                             type="password"
                             placeholder="Enter your password"
                             {...register('password')}
-                            className={errors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                            className={`h-10 xs:h-11 ${errors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                             disabled={isLoading || isSubmitting}
                         />
                         {errors.password && (
-                            <p className="text-sm text-red-500 mt-1">
+                            <p className="text-responsive-xs text-red-500 mt-1">
                                 {errors.password.message}
                             </p>
                         )}
@@ -197,7 +186,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                     <div className="space-y-2">
                         <label
                             htmlFor="confirmPassword"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            className="text-responsive-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                             Confirm Password
                         </label>
@@ -206,11 +195,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                             type="password"
                             placeholder="Confirm your password"
                             {...register('confirmPassword')}
-                            className={errors.confirmPassword ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                            className={`h-10 xs:h-11 ${errors.confirmPassword ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                             disabled={isLoading || isSubmitting}
                         />
                         {errors.confirmPassword && (
-                            <p className="text-sm text-red-500 mt-1">
+                            <p className="text-responsive-xs text-red-500 mt-1">
                                 {errors.confirmPassword.message}
                             </p>
                         )}
@@ -224,16 +213,16 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
                     )}
                 </CardContent>
 
-                <CardFooter className="flex flex-col space-y-4">
+                <CardFooter className="flex flex-col space-y-3 p-4 xs:space-y-4 xs:p-6">
                     <Button
                         type="submit"
-                        className="w-full"
+                        className="touch-target w-full h-10 xs:h-11"
                         disabled={isLoading || isSubmitting}
                     >
                         {isLoading || isSubmitting ? 'Creating Account...' : 'Create Account'}
                     </Button>
 
-                    <div className="text-center text-sm">
+                    <div className="text-center text-responsive-xs">
                         <span className="text-muted-foreground">Already have an account? </span>
                         <Link
                             to="/login"

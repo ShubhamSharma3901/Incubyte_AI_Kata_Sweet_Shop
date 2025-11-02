@@ -1,81 +1,31 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { authAPI } from '../services/api';
+import { showErrorToast, showSuccessToast, getErrorMessage } from '../utils/errorHandling';
 import type { User, LoginCredentials, RegisterData } from '../types';
 
 /**
  * Authentication store state interface
- * Manages user authentication, session persistence, and auth-related UI states
  */
 interface AuthState {
     // State
-    /** Current authenticated user data, null if not logged in */
     user: User | null;
-    /** Boolean indicating if user is currently authenticated */
     isAuthenticated: boolean;
-    /** Loading state for auth operations (login, register, logout, checkAuth) */
     isLoading: boolean;
-    /** Current error message from auth operations, null if no error */
     error: string | null;
-
-    // Computed getters
-    /** Computed property indicating if current user has admin privileges */
     isAdmin: boolean;
 
     // Actions
-    /**
-     * Authenticate user with email and password
-     * @param credentials - User login credentials containing email and password
-     * @throws Error if login fails or credentials are invalid
-     */
     login: (credentials: LoginCredentials) => Promise<void>;
-    /**
-     * Register a new user account
-     * @param userData - Registration data including username, email, password, and confirmPassword
-     * @throws Error if registration fails or validation errors occur
-     */
     register: (userData: RegisterData) => Promise<void>;
-    /**
-     * Log out current user and clear session
-     * Continues with local logout even if API call fails
-     */
     logout: () => Promise<void>;
-    /**
-     * Check current authentication status with server
-     * Validates stored session and updates user data
-     */
     checkAuth: () => Promise<void>;
-    /** Clear current error state */
     clearError: () => void;
-    /**
-     * Manually set loading state
-     * @param loading - Loading state to set
-     */
     setLoading: (loading: boolean) => void;
 }
 
 /**
  * Zustand store for authentication state management
- * 
- * Features:
- * - User session persistence using localStorage
- * - Automatic session validation
- * - Admin role checking
- * - Error handling for auth operations
- * - Loading states for UI feedback
- * 
- * @example
- * ```tsx
- * const { user, login, logout, isAdmin } = useAuthStore();
- * 
- * // Login user
- * await login({ email: 'user@example.com', password: 'password' });
- * 
- * // Check if user is admin
- * if (isAdmin) {
- *   // Show admin features
- * }
- * ```
  */
 export const useAuthStore = create<AuthState>()(
     persist(
@@ -100,8 +50,10 @@ export const useAuthStore = create<AuthState>()(
                         isLoading: false,
                         error: null
                     });
+
+                    showSuccessToast('Login Successful', `Welcome back, ${user.name}!`);
                 } catch (error: any) {
-                    const errorMessage = error.response?.data?.error || 'Login failed. Please check your credentials.';
+                    const errorMessage = getErrorMessage(error);
                     set({
                         user: null,
                         isAuthenticated: false,
@@ -109,6 +61,7 @@ export const useAuthStore = create<AuthState>()(
                         isLoading: false,
                         error: errorMessage
                     });
+                    showErrorToast('Login Failed', errorMessage);
                     throw error;
                 }
             },
@@ -126,8 +79,10 @@ export const useAuthStore = create<AuthState>()(
                         isLoading: false,
                         error: null
                     });
+
+                    showSuccessToast('Registration Successful', `Welcome to Sweet Shop, ${user.name}!`);
                 } catch (error: any) {
-                    const errorMessage = error.response?.data?.error || 'Registration failed. Please try again.';
+                    const errorMessage = getErrorMessage(error);
                     set({
                         user: null,
                         isAuthenticated: false,
@@ -135,6 +90,7 @@ export const useAuthStore = create<AuthState>()(
                         isLoading: false,
                         error: errorMessage
                     });
+                    showErrorToast('Registration Failed', errorMessage);
                     throw error;
                 }
             },
@@ -145,8 +101,8 @@ export const useAuthStore = create<AuthState>()(
 
                 try {
                     await authAPI.logout();
+                    showSuccessToast('Logged Out', 'You have been successfully logged out.');
                 } catch (error) {
-                    // Continue with logout even if API call fails
                     console.warn('Logout API call failed, but continuing with local logout');
                 } finally {
                     set({
@@ -161,13 +117,10 @@ export const useAuthStore = create<AuthState>()(
 
             // Check authentication status
             checkAuth: async () => {
-                // Don't check if already loading
                 if (get().isLoading) return;
 
-                // Check if we have a token in localStorage
                 const token = localStorage.getItem('auth-token');
                 if (!token) {
-                    // No token, user is not authenticated
                     set({
                         user: null,
                         isAuthenticated: false,
@@ -190,7 +143,6 @@ export const useAuthStore = create<AuthState>()(
                         error: null
                     });
                 } catch (error: any) {
-                    // If auth check fails, clear the stored session
                     localStorage.removeItem('auth-token');
                     set({
                         user: null,
@@ -215,28 +167,22 @@ export const useAuthStore = create<AuthState>()(
         {
             name: 'auth-storage',
             storage: createJSONStorage(() => localStorage),
-            // Only persist user data and authentication status
             partialize: (state) => ({
                 user: state.user,
                 isAuthenticated: state.isAuthenticated,
                 isAdmin: state.isAdmin,
             }),
-            // Handle hydration properly
             onRehydrateStorage: () => (state) => {
-                // After rehydration, check if we have a valid token
                 if (state?.isAuthenticated) {
                     const token = localStorage.getItem('auth-token');
                     if (token) {
-                        // Set the token in axios headers
                         import('../services/api').then(({ default: api }) => {
                             api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                         });
-                        // Ensure isAdmin is correctly set based on user role
                         if (state.user) {
                             state.isAdmin = state.user.role === 'ADMIN';
                         }
                     } else {
-                        // No token found, clear authentication
                         state.user = null;
                         state.isAuthenticated = false;
                         state.isAdmin = false;

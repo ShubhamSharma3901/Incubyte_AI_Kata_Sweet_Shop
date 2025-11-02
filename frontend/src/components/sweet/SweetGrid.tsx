@@ -39,7 +39,7 @@ export const SweetGrid: React.FC<SweetGridProps> = ({
     // Loading state - show skeleton cards
     if (isLoading) {
         return (
-            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ${className}`}>
+            <div className={`grid-responsive-cards ${className}`}>
                 {Array.from({ length: 8 }).map((_, index) => (
                     <SkeletonCard key={index} />
                 ))}
@@ -87,7 +87,7 @@ export const SweetGrid: React.FC<SweetGridProps> = ({
 
     // Main grid display
     return (
-        <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ${className}`}>
+        <div className={`grid-responsive-cards ${className}`}>
             {sweets.map((sweet, index) => (
                 <SweetCard
                     key={sweet.id}

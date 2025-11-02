@@ -1,7 +1,7 @@
 import * as React from "react";
+import { useLocation } from "react-router-dom";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
-import { ErrorBoundary } from "@/components/ui/error";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/lib/utils";
@@ -24,11 +24,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 	showSidebar = false,
 }) => {
 	const { user, isAuthenticated } = useAuthStore();
+	const location = useLocation();
 	const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 	const [isDesktop, setIsDesktop] = React.useState<boolean>(() => {
 		if (typeof window === "undefined") return false;
 		return window.matchMedia("(min-width: 1024px)").matches;
 	});
+	const previousPathRef = React.useRef(location.pathname);
 
 	const shouldShowSidebar = showSidebar && isAuthenticated;
 
@@ -45,7 +47,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 
 		const syncSidebarState = (matches: boolean) => {
 			setIsDesktop(matches);
-			setIsSidebarOpen(false);
+			// Always close mobile sidebar when switching to desktop
+			if (matches) {
+				setIsSidebarOpen(false);
+			}
 		};
 
 		syncSidebarState(mediaQuery.matches);
@@ -53,7 +58,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 			syncSidebarState(event.matches);
 		mediaQuery.addEventListener("change", listener);
 
-		return () => mediaQuery.removeEventListener("change", listener);
+		return () => {
+			mediaQuery.removeEventListener("change", listener);
+			// Ensure sidebar is closed on cleanup
+			setIsSidebarOpen(false);
+		};
 	}, [shouldShowSidebar]);
 
 	const navigationLinks = React.useMemo(() => {
@@ -85,73 +94,89 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 
 	const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
 
+	// Close sidebar on route changes (mobile)
+	React.useEffect(() => {
+		if (!isDesktop && previousPathRef.current !== location.pathname) {
+			setIsSidebarOpen(false);
+		}
+		previousPathRef.current = location.pathname;
+	}, [location.pathname, isDesktop]);
+
+	// Global cleanup to ensure body styles are reset
+	React.useEffect(() => {
+		return () => {
+			document.body.style.overflow = '';
+			document.body.style.touchAction = '';
+		};
+	}, []);
+
 	return (
-		<ErrorBoundary>
-			<div className='relative min-h-screen overflow-hidden bg-gradient-to-br from-rose-50 via-white to-sky-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950'>
-				<div className='pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-primary/15 via-transparent to-transparent dark:from-primary/10' />
 
-				<div className='relative mx-auto flex min-h-screen w-full max-w-[1520px] flex-col gap-4 px-2 pb-6 pt-4 sm:px-4 lg:flex-row lg:gap-6 lg:px-6'>
-					{shouldShowSidebar && (
-						<>
-							<Sidebar
-								open={isSidebarOpen}
-								setOpen={setIsSidebarOpen}
-								animate={true}>
-								<SidebarBody className='justify-between gap-8'>
-									<div className='flex flex-1 flex-col overflow-hidden'>
-										<Logo expanded={isSidebarOpen} />
-										<nav className='mt-10 flex flex-col gap-1'>
-											{navigationLinks.map((link) => (
-												<SidebarLink key={link.href} link={link} />
-											))}
-										</nav>
-									</div>
-									<div>
-										<SidebarLink
-											link={{
-												label: user?.name || "Profile",
-												href: "/profile",
-												icon: (
-													<div className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-gradient-to-br from-primary/20 to-sky-500/20 shadow-sm">
-														{user?.role === 'ADMIN' ? (
-															<IconUserCog className="h-4 w-4 text-primary" />
-														) : (
-															<IconUser className="h-4 w-4 text-primary" />
-														)}
-													</div>
-												),
-											}}
-										/>
-									</div>
-								</SidebarBody>
-							</Sidebar>
-						</>
-					)}
+		<div className='relative min-h-screen overflow-hidden bg-gradient-to-br from-rose-50 via-white to-sky-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950'>
+			<div className='pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-primary/15 via-transparent to-transparent dark:from-primary/10' />
 
-					<div
-						className={cn(
-							"relative flex flex-1 flex-col overflow-hidden rounded-3xl border border-white/60 bg-white/85 shadow-xl shadow-primary/5 backdrop-blur-xl transition-colors dark:border-neutral-800/60 dark:bg-neutral-900/80 dark:shadow-black/40",
-							!shouldShowSidebar && "mx-auto w-full max-w-6xl"
-						)}>
-						<Header
-							onSearch={onSearch}
-							onToggleSidebar={shouldShowSidebar ? toggleSidebar : undefined}
-							isSidebarOpen={
-								shouldShowSidebar && !isDesktop ? isSidebarOpen : undefined
-							}
-						/>
+			<div className='relative mx-auto flex min-h-screen w-full max-w-[1520px] flex-col gap-3 px-3 pb-4 pt-3 safe-area-inset xs:gap-4 xs:px-4 xs:pb-6 xs:pt-4 sm:px-6 lg:flex-row lg:gap-6 lg:px-8'>
+				{shouldShowSidebar && (
+					<>
+						<Sidebar
+							open={isSidebarOpen}
+							setOpen={setIsSidebarOpen}
+							animate={true}
+							isDesktop={isDesktop}>
+							<SidebarBody className='justify-between gap-8'>
+								<div className='flex flex-1 flex-col overflow-hidden'>
+									<Logo expanded={isSidebarOpen} />
+									<nav className='mt-10 flex flex-col gap-1'>
+										{navigationLinks.map((link) => (
+											<SidebarLink key={link.href} link={link} />
+										))}
+									</nav>
+								</div>
+								<div>
+									<SidebarLink
+										link={{
+											label: user?.name || "Profile",
+											href: "/profile",
+											icon: (
+												<div className="flex h-8 w-8 items-center justify-center rounded-full border border-white/40 bg-gradient-to-br from-primary/20 to-sky-500/20 shadow-sm">
+													{user?.role === 'ADMIN' ? (
+														<IconUserCog className="h-4 w-4 text-primary" />
+													) : (
+														<IconUser className="h-4 w-4 text-primary" />
+													)}
+												</div>
+											),
+										}}
+									/>
+								</div>
+							</SidebarBody>
+						</Sidebar>
+					</>
+				)}
 
-						<main className='flex-1 overflow-y-auto px-4 py-6 sm:px-8 lg:px-10'>
-							<div className='mx-auto w-full max-w-6xl space-y-6'>
-								{children}
-							</div>
-						</main>
+				<div
+					className={cn(
+						"relative flex flex-1 flex-col overflow-hidden rounded-3xl border border-white/60 bg-white/85 shadow-xl shadow-primary/5 backdrop-blur-xl transition-colors dark:border-neutral-800/60 dark:bg-neutral-900/80 dark:shadow-black/40",
+						!shouldShowSidebar && "mx-auto w-full max-w-6xl"
+					)}>
+					<Header
+						onSearch={onSearch}
+						onToggleSidebar={shouldShowSidebar ? toggleSidebar : undefined}
+						isSidebarOpen={
+							shouldShowSidebar && !isDesktop ? isSidebarOpen : undefined
+						}
+					/>
 
-						<Footer />
-					</div>
+					<main className='flex-1 overflow-y-auto px-3 py-4 xs:px-4 xs:py-6 sm:px-6 sm:py-8 lg:px-10'>
+						<div className='mx-auto w-full max-w-6xl space-responsive'>
+							{children}
+						</div>
+					</main>
+
+					<Footer />
 				</div>
 			</div>
-		</ErrorBoundary>
+		</div>
 	);
 };
 

@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { DashboardContainer, DashboardHeader, DashboardGrid } from '@/components/ui/dashboard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useSweetStore } from '@/store/sweetStore';
 import { SweetForm } from '@/components/sweet';
-import { IconCandy, IconPlus, IconEdit, IconTrash, IconRefresh } from '@tabler/icons-react';
+import { IconCandy, IconPlus, IconEdit, IconTrash, IconRefresh, IconAlertTriangle } from '@tabler/icons-react';
 import type { Sweet } from '@/types';
 
 /**
@@ -24,9 +24,11 @@ import type { Sweet } from '@/types';
  */
 export const AdminPage: React.FC = () => {
     const { toast } = useToast();
-    const { sweets, fetchSweets, isLoading } = useSweetStore();
+    const { sweets, fetchSweets, deleteSweet, isLoading } = useSweetStore();
     const [showAddForm, setShowAddForm] = useState(false);
     const [editingSweet, setEditingSweet] = useState<Sweet | null>(null);
+    const [showDeleteDialog, setShowDeleteDialog] = useState<{ [key: string]: boolean }>({});
+    const [deletingSweet, setDeletingSweet] = useState<string | null>(null);
 
     // Fetch sweets on component mount
     useEffect(() => {
@@ -84,27 +86,52 @@ export const AdminPage: React.FC = () => {
         }
     };
 
+    /**
+     * Handle sweet deletion with proper error handling and UI feedback
+     */
+    const handleDelete = async (sweet: Sweet) => {
+        setDeletingSweet(sweet.id);
+
+        try {
+            await deleteSweet(sweet.id);
+            toast({
+                title: "Sweet deleted successfully",
+                description: `${sweet.name} has been removed from inventory`,
+            });
+            setShowDeleteDialog(prev => ({ ...prev, [sweet.id]: false }));
+        } catch (error: any) {
+            toast({
+                title: "Delete failed",
+                description: error.response?.data?.message ?? "Failed to delete sweet. Please try again.",
+                variant: "destructive",
+            });
+        } finally {
+            setDeletingSweet(null);
+        }
+    };
+
     return (
         <DashboardContainer>
             <DashboardHeader
                 title="Admin Panel"
                 description="Manage your sweet shop inventory"
                 action={
-                    <div className="flex gap-2">
-                        <Button onClick={handleRefresh} variant="outline" disabled={isLoading}>
+                    <div className="flex flex-col gap-2 xs:flex-row">
+                        <Button onClick={handleRefresh} variant="outline" disabled={isLoading} className="touch-target w-full xs:w-auto">
                             <IconRefresh className="h-4 w-4 mr-2" />
-                            Refresh
+                            <span className="hidden xs:inline">Refresh</span>
                         </Button>
                         <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
                             <DialogTrigger asChild>
-                                <Button>
+                                <Button className="touch-target w-full xs:w-auto">
                                     <IconPlus className="h-4 w-4 mr-2" />
-                                    Add New Sweet
+                                    <span className="xs:hidden">Add Sweet</span>
+                                    <span className="hidden xs:inline">Add New Sweet</span>
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="max-w-2xl">
+                            <DialogContent className="mx-3 w-[calc(100vw-1.5rem)] max-w-2xl safe-area-inset sm:mx-auto sm:w-full">
                                 <DialogHeader>
-                                    <DialogTitle>Add New Sweet</DialogTitle>
+                                    <DialogTitle className="text-responsive-lg">Add New Sweet</DialogTitle>
                                 </DialogHeader>
                                 <SweetForm
                                     onSuccess={handleAddSuccess}
@@ -124,34 +151,35 @@ export const AdminPage: React.FC = () => {
                         <IconCandy className="h-5 w-5 text-primary" />
                     </CardHeader>
                     <CardContent>
-                        <p className="text-sm text-muted-foreground mb-4">
+                        <p className="text-responsive-sm text-muted-foreground mb-4">
                             Add, edit, and remove sweets from your inventory. All changes will be reflected immediately on the dashboard.
                         </p>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 lg:grid-cols-3">
                             <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
                                 <DialogTrigger asChild>
-                                    <Button className="w-full" variant="default">
+                                    <Button className="touch-target w-full h-10 xs:h-11" variant="default">
                                         <IconPlus className="h-4 w-4 mr-2" />
-                                        Add New Sweet
+                                        <span className="text-responsive-sm">Add New Sweet</span>
                                     </Button>
                                 </DialogTrigger>
                             </Dialog>
                             <Button
-                                className="w-full"
+                                className="touch-target w-full h-10 xs:h-11"
                                 variant="outline"
                                 onClick={handleRefresh}
                                 disabled={isLoading}
                             >
                                 <IconRefresh className="h-4 w-4 mr-2" />
-                                Refresh Inventory
+                                <span className="text-responsive-sm">Refresh Inventory</span>
                             </Button>
                             <Button
-                                className="w-full"
+                                className="touch-target w-full h-10 xs:h-11"
                                 variant="outline"
                                 disabled
+                                title="Bulk delete functionality coming soon"
                             >
                                 <IconTrash className="h-4 w-4 mr-2" />
-                                Bulk Delete (Coming Soon)
+                                <span className="text-responsive-sm">Bulk Delete</span>
                             </Button>
                         </div>
                     </CardContent>
@@ -178,34 +206,91 @@ export const AdminPage: React.FC = () => {
                                 {sweets.map((sweet) => (
                                     <div
                                         key={sweet.id}
-                                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                                        className="flex flex-col gap-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors xs:flex-row xs:items-center xs:justify-between xs:p-4"
                                     >
                                         <div className="flex-1">
-                                            <h4 className="font-medium">{sweet.name}</h4>
-                                            <p className="text-sm text-muted-foreground">
+                                            <h4 className="font-medium text-responsive-sm">{sweet.name}</h4>
+                                            <p className="text-responsive-xs text-muted-foreground">
                                                 {sweet.category} • ₹{sweet.price.toFixed(2)} • {sweet.quantity} in stock
                                             </p>
                                             {sweet.description && (
-                                                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                                                <p className="text-responsive-xs text-muted-foreground mt-1 line-clamp-2">
                                                     {sweet.description}
                                                 </p>
                                             )}
                                         </div>
-                                        <div className="flex gap-2 ml-4">
+                                        <div className="flex gap-2 xs:ml-4">
                                             <Button
                                                 size="sm"
                                                 variant="outline"
                                                 onClick={() => setEditingSweet(sweet)}
+                                                className="touch-target flex-1 xs:flex-none"
                                             >
-                                                <IconEdit className="h-4 w-4" />
+                                                <IconEdit className="h-4 w-4 mr-2 xs:mr-0" />
+                                                <span className="xs:hidden">Edit</span>
                                             </Button>
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                disabled
+                                            <Dialog
+                                                open={showDeleteDialog[sweet.id] || false}
+                                                onOpenChange={(open) => setShowDeleteDialog(prev => ({ ...prev, [sweet.id]: open }))}
                                             >
-                                                <IconTrash className="h-4 w-4" />
-                                            </Button>
+                                                <DialogTrigger asChild>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        disabled={deletingSweet === sweet.id || isLoading}
+                                                        className="touch-target flex-1 xs:flex-none"
+                                                    >
+                                                        {deletingSweet === sweet.id ? (
+                                                            <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent xs:h-4 xs:w-4" />
+                                                        ) : (
+                                                            <>
+                                                                <IconTrash className="h-4 w-4 mr-2 xs:mr-0" />
+                                                                <span className="xs:hidden">Delete</span>
+                                                            </>
+                                                        )}
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DialogContent className="sm:max-w-md">
+                                                    <DialogHeader>
+                                                        <DialogTitle className="flex items-center gap-2">
+                                                            <IconAlertTriangle className="h-5 w-5 text-destructive" />
+                                                            Confirm Deletion
+                                                        </DialogTitle>
+                                                        <DialogDescription className="text-left">
+                                                            Are you sure you want to delete <strong>"{sweet.name}"</strong>?
+                                                            This action cannot be undone and will permanently remove this sweet from your inventory.
+                                                        </DialogDescription>
+                                                    </DialogHeader>
+                                                    <DialogFooter className="flex-col sm:flex-row gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            onClick={() => setShowDeleteDialog(prev => ({ ...prev, [sweet.id]: false }))}
+                                                            disabled={deletingSweet === sweet.id}
+                                                            className="w-full sm:w-auto"
+                                                        >
+                                                            Cancel
+                                                        </Button>
+                                                        <Button
+                                                            variant="destructive"
+                                                            onClick={() => handleDelete(sweet)}
+                                                            disabled={deletingSweet === sweet.id}
+                                                            className="w-full sm:w-auto"
+                                                        >
+                                                            {deletingSweet === sweet.id ? (
+                                                                <>
+                                                                    <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                                                                    Deleting...
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <IconTrash className="mr-2 h-4 w-4" />
+                                                                    Delete Sweet
+                                                                </>
+                                                            )}
+                                                        </Button>
+                                                    </DialogFooter>
+                                                </DialogContent>
+                                            </Dialog>
                                         </div>
                                     </div>
                                 ))}
@@ -217,9 +302,9 @@ export const AdminPage: React.FC = () => {
 
             {/* Edit Sweet Dialog */}
             <Dialog open={!!editingSweet} onOpenChange={(open) => !open && setEditingSweet(null)}>
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="mx-3 w-[calc(100vw-1.5rem)] max-w-2xl safe-area-inset sm:mx-auto sm:w-full">
                     <DialogHeader>
-                        <DialogTitle>Edit Sweet</DialogTitle>
+                        <DialogTitle className="text-responsive-lg">Edit Sweet</DialogTitle>
                     </DialogHeader>
                     {editingSweet && (
                         <SweetForm
@@ -230,6 +315,7 @@ export const AdminPage: React.FC = () => {
                     )}
                 </DialogContent>
             </Dialog>
+
 
 
         </DashboardContainer>

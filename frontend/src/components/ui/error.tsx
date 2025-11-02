@@ -32,43 +32,27 @@ const ErrorMessage = React.forwardRef<HTMLDivElement, ErrorMessageProps>(
 )
 ErrorMessage.displayName = "ErrorMessage"
 
-interface ErrorBoundaryState {
-    hasError: boolean
-    error?: Error
-}
-
-class ErrorBoundary extends React.Component<
-    React.PropsWithChildren<{}>,
-    ErrorBoundaryState
-> {
-    constructor(props: React.PropsWithChildren<{}>) {
-        super(props)
-        this.state = { hasError: false }
-    }
-
-    static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-        return { hasError: true, error }
-    }
-
-    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-        console.error('Error caught by boundary:', error, errorInfo)
-    }
-
-    render() {
-        if (this.state.hasError) {
-            return (
-                <div className="min-h-screen flex items-center justify-center p-4">
-                    <ErrorMessage
-                        title="Application Error"
-                        message="An unexpected error occurred. Please refresh the page and try again."
-                        onRetry={() => window.location.reload()}
-                    />
+/**
+ * Simple 404 Not Found component
+ */
+const NotFoundError: React.FC = () => {
+    return (
+        <div className="min-h-screen flex items-center justify-center p-4">
+            <div className="text-center space-y-4">
+                <h1 className="text-6xl font-bold text-muted-foreground">404</h1>
+                <h2 className="text-2xl font-semibold">Page Not Found</h2>
+                <p className="text-muted-foreground">The page you're looking for doesn't exist.</p>
+                <div className="flex gap-4 justify-center">
+                    <Button onClick={() => window.history.back()} variant="outline">
+                        Go Back
+                    </Button>
+                    <Button onClick={() => window.location.href = '/'}>
+                        Go Home
+                    </Button>
                 </div>
-            )
-        }
+            </div>
+        </div>
+    );
+};
 
-        return this.props.children
-    }
-}
-
-export { ErrorMessage, ErrorBoundary }
+export { ErrorMessage, NotFoundError }

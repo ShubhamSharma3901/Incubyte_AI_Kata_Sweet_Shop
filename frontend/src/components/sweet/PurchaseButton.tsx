@@ -242,13 +242,13 @@ export const PurchaseButton: React.FC<PurchaseButtonProps> = ({
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                        <IconShoppingCart className="h-5 w-5" />
+            <DialogContent className="mx-3 w-[calc(100vw-1.5rem)] max-w-md safe-area-inset sm:mx-auto sm:w-full">
+                <DialogHeader className="space-y-2">
+                    <DialogTitle className="flex items-center gap-2 text-responsive-lg">
+                        <IconShoppingCart className="h-4 w-4 xs:h-5 xs:w-5" />
                         Purchase {sweet.name}
                     </DialogTitle>
-                    <DialogDescription>
+                    <DialogDescription className="text-responsive-sm">
                         Select the quantity you want to purchase.
                         {isLowStock && (
                             <span className="text-orange-600 font-medium">
@@ -258,12 +258,12 @@ export const PurchaseButton: React.FC<PurchaseButtonProps> = ({
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="space-y-4 py-4">
+                <div className="space-y-3 py-3 xs:space-y-4 xs:py-4">
                     {/* Sweet info */}
-                    <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/30">
+                    <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30 xs:p-4">
                         <div>
-                            <h4 className="font-semibold">{sweet.name}</h4>
-                            <p className="text-sm text-muted-foreground">₹{priceInRupees} per item</p>
+                            <h4 className="font-semibold text-responsive-sm">{sweet.name}</h4>
+                            <p className="text-responsive-xs text-muted-foreground">₹{priceInRupees} per item</p>
                         </div>
                         <Badge variant="outline" className="text-xs">
                             {sweet.quantity} in stock
@@ -272,17 +272,17 @@ export const PurchaseButton: React.FC<PurchaseButtonProps> = ({
 
                     {/* Quantity selector */}
                     <div className="space-y-2">
-                        <label className="text-sm font-medium">Quantity</label>
-                        <div className="flex items-center gap-3">
+                        <label className="text-responsive-sm font-medium">Quantity</label>
+                        <div className="flex items-center gap-2 xs:gap-3">
                             <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
                                 onClick={() => adjustQuantity(-1)}
                                 disabled={selectedQuantity <= 1}
-                                className="h-9 w-9 p-0"
+                                className="touch-target h-8 w-8 p-0 xs:h-9 xs:w-9"
                             >
-                                <IconMinus className="h-4 w-4" />
+                                <IconMinus className="h-3.5 w-3.5 xs:h-4 xs:w-4" />
                             </Button>
 
                             <Input
@@ -291,7 +291,7 @@ export const PurchaseButton: React.FC<PurchaseButtonProps> = ({
                                 max={maxQuantity}
                                 value={selectedQuantity}
                                 onChange={(e) => handleQuantityInput(e.target.value)}
-                                className="w-20 text-center"
+                                className="w-16 text-center text-responsive-sm xs:w-20"
                             />
 
                             <Button
@@ -300,9 +300,9 @@ export const PurchaseButton: React.FC<PurchaseButtonProps> = ({
                                 size="sm"
                                 onClick={() => adjustQuantity(1)}
                                 disabled={selectedQuantity >= maxQuantity}
-                                className="h-9 w-9 p-0"
+                                className="touch-target h-8 w-8 p-0 xs:h-9 xs:w-9"
                             >
-                                <IconPlus className="h-4 w-4" />
+                                <IconPlus className="h-3.5 w-3.5 xs:h-4 xs:w-4" />
                             </Button>
                         </div>
 
@@ -314,18 +314,19 @@ export const PurchaseButton: React.FC<PurchaseButtonProps> = ({
                     </div>
 
                     {/* Total price */}
-                    <div className="flex items-center justify-between p-4 rounded-lg border bg-primary/5">
-                        <span className="font-medium">Total Price:</span>
-                        <span className="text-xl font-bold">₹{totalPrice}</span>
+                    <div className="flex items-center justify-between p-3 rounded-lg border bg-primary/5 xs:p-4">
+                        <span className="font-medium text-responsive-sm">Total Price:</span>
+                        <span className="text-responsive-lg font-bold">₹{totalPrice}</span>
                     </div>
                 </div>
 
-                <DialogFooter className="gap-2">
+                <DialogFooter className="flex-col gap-2 xs:flex-row">
                     <Button
                         type="button"
                         variant="outline"
                         onClick={() => setIsDialogOpen(false)}
                         disabled={isPurchasing}
+                        className="touch-target w-full xs:w-auto"
                     >
                         Cancel
                     </Button>
@@ -333,17 +334,19 @@ export const PurchaseButton: React.FC<PurchaseButtonProps> = ({
                         type="button"
                         onClick={handleQuantityPurchase}
                         disabled={isPurchasing || selectedQuantity <= 0 || selectedQuantity > sweet.quantity}
-                        className="flex items-center gap-2"
+                        className="touch-target flex w-full items-center gap-2 xs:w-auto"
                     >
                         {isPurchasing ? (
                             <>
-                                <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                                Processing…
+                                <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent xs:h-4 xs:w-4" />
+                                <span className="text-responsive-xs">Processing…</span>
                             </>
                         ) : (
                             <>
-                                <IconShoppingCart className="h-4 w-4" />
-                                Purchase {selectedQuantity > 1 ? `${selectedQuantity} items` : '1 item'}
+                                <IconShoppingCart className="h-3.5 w-3.5 xs:h-4 xs:w-4" />
+                                <span className="text-responsive-xs">
+                                    Purchase {selectedQuantity > 1 ? `${selectedQuantity} items` : '1 item'}
+                                </span>
                             </>
                         )}
                     </Button>

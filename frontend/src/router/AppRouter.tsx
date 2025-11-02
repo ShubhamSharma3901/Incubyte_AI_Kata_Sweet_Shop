@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { AuthGuard, AdminGuard } from '@/components/guards';
@@ -11,24 +11,10 @@ import {
     AdminPage
 } from '@/pages';
 import { Toaster } from '@/components/ui/toaster';
+import { NotFoundError } from '@/components/ui/error';
 
 /**
  * Main application router component
- * 
- * Handles all routing logic including:
- * - Public routes (login, register)
- * - Protected routes (dashboard, sweets)
- * - Admin-only routes (admin panel)
- * - Route guards and authentication checks
- * - Layout wrapping for authenticated routes
- * 
- * Route Structure:
- * - / -> Redirects to dashboard if authenticated, login if not
- * - /login -> Login page (redirects to dashboard if authenticated)
- * - /register -> Registration page (redirects to dashboard if authenticated)
- * - /dashboard -> Protected dashboard page
- * - /sweets -> Protected sweets browsing page
- * - /admin -> Admin-only management page
  */
 export const AppRouter: React.FC = () => {
     const { isAuthenticated, isLoading, checkAuth } = useAuthStore();
@@ -45,7 +31,6 @@ export const AppRouter: React.FC = () => {
     }, [checkAuth]);
 
     const handleSearch = (term: string) => {
-        // TODO: Implement global search functionality in later tasks
         console.log('Search term:', term);
     };
 
@@ -171,23 +156,7 @@ export const AppRouter: React.FC = () => {
                 />
 
                 {/* Catch-all route for 404 */}
-                <Route
-                    path="*"
-                    element={
-                        <div className="min-h-screen flex items-center justify-center">
-                            <div className="text-center space-y-4">
-                                <h1 className="text-4xl font-bold text-muted-foreground">404</h1>
-                                <p className="text-muted-foreground">Page not found</p>
-                                <button
-                                    onClick={() => window.history.back()}
-                                    className="text-primary hover:underline"
-                                >
-                                    Go back
-                                </button>
-                            </div>
-                        </div>
-                    }
-                />
+                <Route path="*" element={<NotFoundError />} />
             </Routes>
 
             {/* Global toast notifications */}

@@ -109,25 +109,25 @@ export const SweetFilters: React.FC = () => {
     ].filter(Boolean).length;
 
     return (
-        <div className="space-y-4">
+        <div className="space-responsive">
             {/* Search Bar */}
-            <div className="flex gap-2">
+            <div className="flex gap-2 xs:gap-3">
                 <div className="relative flex-1">
-                    <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <IconSearch className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground xs:left-3" />
                     <Input
-                        placeholder="Search sweets by name or description..."
+                        placeholder="Search sweets..."
                         value={localSearchTerm}
                         onChange={(e) => setLocalSearchTerm(e.target.value)}
-                        className="pl-10"
+                        className="h-9 pl-8 pr-8 text-sm xs:h-10 xs:pl-10 xs:pr-10 sm:h-11"
                     />
                     {localSearchTerm && (
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                            className="touch-target absolute right-0.5 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0 xs:h-8 xs:w-8"
                             onClick={() => setLocalSearchTerm('')}
                         >
-                            <IconX className="h-4 w-4" />
+                            <IconX className="h-3.5 w-3.5 xs:h-4 xs:w-4" />
                         </Button>
                     )}
                 </div>
@@ -135,14 +135,14 @@ export const SweetFilters: React.FC = () => {
                 <Button
                     variant="outline"
                     onClick={() => setShowFilters(!showFilters)}
-                    className="relative"
+                    className="touch-target relative h-9 px-3 text-xs xs:h-10 xs:px-4 xs:text-sm sm:h-11"
                 >
-                    <IconFilter className="h-4 w-4 mr-2" />
-                    Filters
+                    <IconFilter className="h-3.5 w-3.5 mr-1.5 xs:h-4 xs:w-4 xs:mr-2" />
+                    <span className="hidden xs:inline">Filters</span>
                     {activeFilterCount > 0 && (
                         <Badge
                             variant="secondary"
-                            className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs"
+                            className="ml-1 h-4 w-4 p-0 flex items-center justify-center text-xs xs:ml-2 xs:h-5 xs:w-5"
                         >
                             {activeFilterCount}
                         </Badge>
@@ -174,8 +174,8 @@ export const SweetFilters: React.FC = () => {
                     <CardContent className="space-y-4">
                         {/* Price Range Filters */}
                         <div className="space-y-3">
-                            <h4 className="font-medium text-sm">Price Range</h4>
-                            <div className="grid grid-cols-2 gap-3">
+                            <h4 className="font-medium text-responsive-sm">Price Range</h4>
+                            <div className="grid grid-cols-1 gap-3 xs:grid-cols-2">
                                 <div>
                                     <label className="text-xs text-muted-foreground mb-1 block">
                                         Min Price (₹)
@@ -187,6 +187,7 @@ export const SweetFilters: React.FC = () => {
                                         onChange={(e) => handlePriceFilterChange('min', e.target.value)}
                                         min="0"
                                         step="0.01"
+                                        className="h-9 xs:h-10"
                                     />
                                 </div>
                                 <div>
@@ -200,6 +201,7 @@ export const SweetFilters: React.FC = () => {
                                         onChange={(e) => handlePriceFilterChange('max', e.target.value)}
                                         min="0"
                                         step="0.01"
+                                        className="h-9 xs:h-10"
                                     />
                                 </div>
                             </div>
@@ -207,13 +209,13 @@ export const SweetFilters: React.FC = () => {
 
                         {/* Availability Filter */}
                         <div className="space-y-3">
-                            <h4 className="font-medium text-sm">Availability</h4>
+                            <h4 className="font-medium text-responsive-sm">Availability</h4>
                             <div className="flex items-center space-x-2">
                                 <Button
                                     variant={filters.inStock ? "default" : "outline"}
                                     size="sm"
                                     onClick={handleInStockToggle}
-                                    className="text-sm"
+                                    className="touch-target h-9 px-3 text-xs xs:h-10 xs:px-4 xs:text-sm"
                                 >
                                     In Stock Only
                                 </Button>
@@ -224,7 +226,7 @@ export const SweetFilters: React.FC = () => {
             )}
 
             {/* Results Summary */}
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <div className="flex flex-col gap-2 text-xs text-muted-foreground xs:flex-row xs:items-center xs:justify-between xs:text-sm">
                 <div>
                     Showing {filteredSweets.length} of {sweets.length} sweets
                     {hasActiveFilters && (
@@ -234,12 +236,12 @@ export const SweetFilters: React.FC = () => {
 
                 {/* Active Filters Display */}
                 {hasActiveFilters && (
-                    <div className="flex items-center gap-2">
-                        <span>Active filters:</span>
-                        <div className="flex gap-1">
+                    <div className="flex flex-col gap-2 xs:flex-row xs:items-center">
+                        <span className="hidden xs:inline">Active filters:</span>
+                        <div className="flex flex-wrap gap-1">
                             {searchTerm && (
                                 <Badge variant="secondary" className="text-xs">
-                                    Search: "{searchTerm}"
+                                    Search: "{searchTerm.length > 10 ? searchTerm.substring(0, 10) + '...' : searchTerm}"
                                 </Badge>
                             )}
                             {filters.minPrice !== undefined && (

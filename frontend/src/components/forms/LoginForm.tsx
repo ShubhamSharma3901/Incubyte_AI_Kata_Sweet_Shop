@@ -80,13 +80,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             // Attempt to log in the user
             await login(data);
 
-            // Show success message
-            toast({
-                title: 'Login Successful',
-                description: 'Welcome back! You have been successfully logged in.',
-                variant: 'success',
-            });
-
             // Reset form
             reset();
 
@@ -96,33 +89,29 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             // Navigate to dashboard
             navigate('/dashboard');
         } catch (error: any) {
-            // Error is already handled by the auth store and displayed via toast
-            toast({
-                title: 'Login Failed',
-                description: error.response?.data?.message || 'Invalid email or password. Please try again.',
-                variant: 'destructive',
-            });
+            // Error handling is now done in the auth store
+            console.error('Login error:', error);
         }
     };
 
     return (
-        <Card className={`w-full max-w-md mx-auto ${className}`}>
-            <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl font-bold text-center">
+        <Card className={`w-full max-w-md mx-auto safe-area-inset ${className}`}>
+            <CardHeader className="space-y-1 p-4 xs:p-6">
+                <CardTitle className="text-responsive-xl font-bold text-center">
                     Sign In
                 </CardTitle>
-                <CardDescription className="text-center">
+                <CardDescription className="text-center text-responsive-sm">
                     Enter your email and password to access your account
                 </CardDescription>
             </CardHeader>
 
             <form onSubmit={handleSubmit(onSubmit)}>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3 p-4 xs:space-y-4 xs:p-6">
                     {/* Email Field */}
                     <div className="space-y-2">
                         <label
                             htmlFor="email"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            className="text-responsive-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                             Email
                         </label>
@@ -131,11 +120,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                             type="email"
                             placeholder="Enter your email"
                             {...register('email')}
-                            className={errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                            className={`h-10 xs:h-11 ${errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                             disabled={isLoading || isSubmitting}
                         />
                         {errors.email && (
-                            <p className="text-sm text-red-500 mt-1">
+                            <p className="text-responsive-xs text-red-500 mt-1">
                                 {errors.email.message}
                             </p>
                         )}
@@ -145,7 +134,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                     <div className="space-y-2">
                         <label
                             htmlFor="password"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            className="text-responsive-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                             Password
                         </label>
@@ -154,11 +143,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                             type="password"
                             placeholder="Enter your password"
                             {...register('password')}
-                            className={errors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}
+                            className={`h-10 xs:h-11 ${errors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                             disabled={isLoading || isSubmitting}
                         />
                         {errors.password && (
-                            <p className="text-sm text-red-500 mt-1">
+                            <p className="text-responsive-xs text-red-500 mt-1">
                                 {errors.password.message}
                             </p>
                         )}
@@ -172,16 +161,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                     )}
                 </CardContent>
 
-                <CardFooter className="flex flex-col space-y-4">
+                <CardFooter className="flex flex-col space-y-3 p-4 xs:space-y-4 xs:p-6">
                     <Button
                         type="submit"
-                        className="w-full"
+                        className="touch-target w-full h-10 xs:h-11"
                         disabled={isLoading || isSubmitting}
                     >
                         {isLoading || isSubmitting ? 'Signing In...' : 'Sign In'}
                     </Button>
 
-                    <div className="text-center text-sm">
+                    <div className="text-center text-responsive-xs">
                         <span className="text-muted-foreground">Don't have an account? </span>
                         <Link
                             to="/register"
