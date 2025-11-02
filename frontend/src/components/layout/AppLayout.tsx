@@ -14,13 +14,11 @@ import {
 
 interface AppLayoutProps {
 	children: React.ReactNode;
-	onSearch?: (term: string) => void;
 	showSidebar?: boolean;
 }
 
 const AppLayout: React.FC<AppLayoutProps> = ({
 	children,
-	onSearch,
 	showSidebar = false,
 }) => {
 	const { user, isAuthenticated } = useAuthStore();
@@ -112,8 +110,8 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 
 	return (
 
-		<div className='relative min-h-screen overflow-hidden bg-gradient-to-br from-rose-50 via-white to-sky-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950'>
-			<div className='pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-primary/15 via-transparent to-transparent dark:from-primary/10' />
+		<div className='relative min-h-screen overflow-hidden bg-gradient-to-br from-rose-50 via-white to-sky-50'>
+			<div className='pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-primary/15 via-transparent to-transparent' />
 
 			<div className='relative mx-auto flex min-h-screen w-full max-w-[1520px] flex-col gap-3 px-3 pb-4 pt-3 safe-area-inset xs:gap-4 xs:px-4 xs:pb-6 xs:pt-4 sm:px-6 lg:flex-row lg:gap-6 lg:px-8'>
 				{shouldShowSidebar && (
@@ -156,11 +154,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 
 				<div
 					className={cn(
-						"relative flex flex-1 flex-col overflow-hidden rounded-3xl border border-white/60 bg-white/85 shadow-xl shadow-primary/5 backdrop-blur-xl transition-colors dark:border-neutral-800/60 dark:bg-neutral-900/80 dark:shadow-black/40",
+						"relative flex flex-1 flex-col overflow-hidden rounded-3xl border border-white/60 bg-white/85 shadow-xl shadow-primary/5 backdrop-blur-xl transition-colors",
 						!shouldShowSidebar && "mx-auto w-full max-w-6xl"
 					)}>
 					<Header
-						onSearch={onSearch}
 						onToggleSidebar={shouldShowSidebar ? toggleSidebar : undefined}
 						isSidebarOpen={
 							shouldShowSidebar && !isDesktop ? isSidebarOpen : undefined
@@ -183,15 +180,15 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 const Logo: React.FC<{ expanded: boolean }> = ({ expanded }) => {
 	return (
 		<div className={cn(
-			'flex items-center rounded-2xl border border-white/50 bg-white/70 py-3 shadow-sm shadow-neutral-200/50 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/70 dark:shadow-black/30 transition-all duration-200',
+			'flex items-center rounded-2xl border border-white/50 bg-white/70 py-3 shadow-sm shadow-neutral-200/50 backdrop-blur transition-all duration-200',
 			expanded ? 'gap-3 px-4 justify-start' : 'px-3 justify-start'
 		)}>
-			<div className='flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/70 via-primary to-primary/80 text-white shadow-md dark:from-primary/60 dark:via-primary/70 flex-shrink-0'>
+			<div className='flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/70 via-primary to-primary/80 text-white shadow-md flex-shrink-0'>
 				<span className='text-lg font-semibold'>SS</span>
 			</div>
 			{expanded && (
 				<div className='flex flex-col overflow-hidden'>
-					<span className='text-sm font-semibold text-neutral-900 dark:text-neutral-100 whitespace-nowrap'>
+					<span className='text-sm font-semibold text-neutral-900 whitespace-nowrap'>
 						Sweet Shop
 					</span>
 				</div>

@@ -18,7 +18,7 @@ app.use(helmet());
 // Configure CORS for production and development
 const corsOptions = {
     origin: process.env.NODE_ENV === 'production'
-        ? [process.env.FRONTEND_URL || 'https://your-frontend-app.vercel.app']
+        ? [process.env.FRONTEND_URL || 'https://incubyte-ai-kata-sweet-shop.vercel.app']
         : [
             'http://localhost:3000',
             'http://127.0.0.1:3000',

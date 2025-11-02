@@ -18,6 +18,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { PurchaseButton } from "./PurchaseButton";
+import { SweetForm } from "./SweetForm";
 import { useSweetStore } from "@/store/sweetStore";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/hooks/use-toast";
@@ -42,11 +43,12 @@ export const SweetCard: React.FC<SweetCardProps> = ({ sweet, className, style })
 	const { user, isAdmin } = useAuthStore();
 	const { toast } = useToast();
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+	const [showEditDialog, setShowEditDialog] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
 
 	const isOutOfStock = sweet.quantity <= 0;
 	const isLowStock = sweet.quantity > 0 && sweet.quantity <= 5;
-	const priceInRupees = sweet.price && !isNaN(sweet.price) ? sweet.price : 0;
+	const price = sweet.price && !isNaN(sweet.price) ? sweet.price : 0;
 
 	/**
 	 * Handle sweet deletion with proper error handling and UI feedback
@@ -75,6 +77,20 @@ export const SweetCard: React.FC<SweetCardProps> = ({ sweet, className, style })
 		} finally {
 			setIsDeleting(false);
 		}
+	};
+
+	/**
+	 * Handle successful edit form submission
+	 */
+	const handleEditSuccess = () => {
+		setShowEditDialog(false);
+	};
+
+	/**
+	 * Handle edit form cancellation
+	 */
+	const handleEditCancel = () => {
+		setShowEditDialog(false);
 	};
 
 	return (
@@ -115,7 +131,7 @@ export const SweetCard: React.FC<SweetCardProps> = ({ sweet, className, style })
 				<div className="flex items-center justify-between p-3 rounded-xl border border-border bg-muted/30 xs:p-4">
 					<span className="text-xs text-muted-foreground font-medium">Price</span>
 					<span className="text-lg font-bold text-foreground xs:text-xl sm:text-2xl">
-						₹{priceInRupees}
+						₹{price}
 					</span>
 				</div>
 
@@ -148,24 +164,28 @@ export const SweetCard: React.FC<SweetCardProps> = ({ sweet, className, style })
 					/>
 				)}
 
-				{/* Admin controls - Requirement 8.1: Provide delete button for admin users */}
 				{isAdmin && (
 					<div className="flex w-full gap-2 xs:gap-3">
-						<Button
-							variant="outline"
-							onClick={() =>
-								toast({
-									title: "Edit coming soon",
-									description: "Editing sweets will be available in a future release.",
-								})
-							}
-							className="touch-target flex-1 h-9 rounded-xl text-xs xs:h-10 xs:text-sm"
-						>
-							<IconEdit className="mr-1.5 h-3.5 w-3.5 xs:mr-2 xs:h-4 xs:w-4" />
-							Edit
-						</Button>
+						<Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+							<DialogTrigger asChild>
+								<Button
+									variant="outline"
+									className="touch-target flex-1 h-9 rounded-xl text-xs xs:h-10 xs:text-sm"
+								>
+									<IconEdit className="mr-1.5 h-3.5 w-3.5 xs:mr-2 xs:h-4 xs:w-4" />
+									Edit
+								</Button>
+							</DialogTrigger>
+							<DialogContent className="mx-3 w-[calc(100vw-1.5rem)] max-w-2xl safe-area-inset sm:mx-auto sm:w-full">
+								<SweetForm
+									sweet={sweet}
+									onSuccess={handleEditSuccess}
+									onCancel={handleEditCancel}
+								/>
+							</DialogContent>
+						</Dialog>
 
-						{/* Delete confirmation dialog - Requirement 8.2: Display confirmation dialog */}
+
 						<Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
 							<DialogTrigger asChild>
 								<Button

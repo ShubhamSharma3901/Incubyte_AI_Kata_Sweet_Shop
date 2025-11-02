@@ -11,7 +11,6 @@ export interface Sweet {
     id: string;
     name: string;
     category: string;
-    description?: string;
     price: number;
     quantity: number;
     createdAt: string;
@@ -35,7 +34,6 @@ export interface RegisterData {
 export interface CreateSweetData {
     name: string;
     category: string;
-    description?: string;
     price: number;
     quantity: number;
 }
@@ -43,7 +41,6 @@ export interface CreateSweetData {
 export interface UpdateSweetData {
     name?: string;
     category?: string;
-    description?: string;
     price?: number;
     quantity?: number;
 }

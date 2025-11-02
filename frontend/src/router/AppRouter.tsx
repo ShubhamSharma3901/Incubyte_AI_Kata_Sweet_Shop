@@ -30,9 +30,7 @@ export const AppRouter: React.FC = () => {
         initializeAuth();
     }, [checkAuth]);
 
-    const handleSearch = (term: string) => {
-        console.log('Search term:', term);
-    };
+
 
     // Show loading screen while initializing
     if (!isInitialized || isLoading) {
@@ -68,7 +66,7 @@ export const AppRouter: React.FC = () => {
                     path="/dashboard"
                     element={
                         <AuthGuard>
-                            <AppLayout onSearch={handleSearch} showSidebar={true}>
+                            <AppLayout showSidebar={true}>
                                 <DashboardPage />
                             </AppLayout>
                         </AuthGuard>
@@ -79,7 +77,7 @@ export const AppRouter: React.FC = () => {
                     path="/sweets"
                     element={
                         <AuthGuard>
-                            <AppLayout onSearch={handleSearch} showSidebar={true}>
+                            <AppLayout showSidebar={true}>
                                 <SweetsPage />
                             </AppLayout>
                         </AuthGuard>
@@ -91,7 +89,7 @@ export const AppRouter: React.FC = () => {
                     path="/admin"
                     element={
                         <AdminGuard>
-                            <AppLayout onSearch={handleSearch} showSidebar={true}>
+                            <AppLayout showSidebar={true}>
                                 <AdminPage />
                             </AppLayout>
                         </AdminGuard>
@@ -103,10 +101,10 @@ export const AppRouter: React.FC = () => {
                     path="/analytics"
                     element={
                         <AdminGuard>
-                            <AppLayout onSearch={handleSearch} showSidebar={true}>
+                            <AppLayout showSidebar={true}>
                                 <div className="p-6">
                                     <h1 className="text-2xl font-bold mb-4">Analytics</h1>
-                                    <p className="text-neutral-600 dark:text-neutral-400">Analytics dashboard coming soon...</p>
+                                    <p className="text-neutral-600">Analytics dashboard coming soon...</p>
                                 </div>
                             </AppLayout>
                         </AdminGuard>
@@ -117,10 +115,10 @@ export const AppRouter: React.FC = () => {
                     path="/inventory"
                     element={
                         <AdminGuard>
-                            <AppLayout onSearch={handleSearch} showSidebar={true}>
+                            <AppLayout showSidebar={true}>
                                 <div className="p-6">
                                     <h1 className="text-2xl font-bold mb-4">Inventory Management</h1>
-                                    <p className="text-neutral-600 dark:text-neutral-400">Inventory management coming soon...</p>
+                                    <p className="text-neutral-600">Inventory management coming soon...</p>
                                 </div>
                             </AppLayout>
                         </AdminGuard>
@@ -131,10 +129,10 @@ export const AppRouter: React.FC = () => {
                     path="/users"
                     element={
                         <AdminGuard>
-                            <AppLayout onSearch={handleSearch} showSidebar={true}>
+                            <AppLayout showSidebar={true}>
                                 <div className="p-6">
                                     <h1 className="text-2xl font-bold mb-4">User Management</h1>
-                                    <p className="text-neutral-600 dark:text-neutral-400">User management coming soon...</p>
+                                    <p className="text-neutral-600">User management coming soon...</p>
                                 </div>
                             </AppLayout>
                         </AdminGuard>
@@ -145,10 +143,10 @@ export const AppRouter: React.FC = () => {
                     path="/profile"
                     element={
                         <AuthGuard>
-                            <AppLayout onSearch={handleSearch} showSidebar={true}>
+                            <AppLayout showSidebar={true}>
                                 <div className="p-6">
                                     <h1 className="text-2xl font-bold mb-4">Profile</h1>
-                                    <p className="text-neutral-600 dark:text-neutral-400">Profile page coming soon...</p>
+                                    <p className="text-neutral-600">Profile page coming soon...</p>
                                 </div>
                             </AppLayout>
                         </AuthGuard>

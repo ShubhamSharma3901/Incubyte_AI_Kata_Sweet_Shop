@@ -8,7 +8,7 @@ const footerLinks = [
 
 const Footer: React.FC = () => {
     return (
-        <footer className="relative mt-auto border-t border-white/40 bg-white/60 px-3 py-4 text-sm text-neutral-500 shadow-inner shadow-white/40 backdrop-blur-xl transition-colors dark:border-neutral-800/70 dark:bg-neutral-950/70 dark:text-neutral-400 dark:shadow-black/40 safe-area-inset xs:px-4 xs:py-6 sm:px-6">
+        <footer className="relative mt-auto border-t border-white/40 bg-white/60 px-3 py-4 text-sm text-neutral-500 shadow-inner shadow-white/40 backdrop-blur-xl transition-colors safe-area-inset xs:px-4 xs:py-6 sm:px-6">
             <div className="absolute inset-0 overflow-hidden">
                 <div className="pointer-events-none absolute left-1/2 top-0 h-40 w-[60%] -translate-x-1/2 rounded-full bg-primary/15 blur-3xl" />
             </div>
@@ -17,7 +17,7 @@ const Footer: React.FC = () => {
                     <span className="text-xs uppercase tracking-[0.3em] text-primary xs:tracking-[0.4em]">
                         Sweet Shop
                     </span>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                    <p className="text-xs text-neutral-500">
                         © {new Date().getFullYear()} Crafted with love and sugar.
                     </p>
                 </div>
@@ -26,7 +26,7 @@ const Footer: React.FC = () => {
                         <a
                             key={link.label}
                             href={link.href}
-                            className="touch-target rounded-full border border-white/40 bg-white/70 px-2.5 py-1 text-xs font-medium text-neutral-600 shadow-sm shadow-white/40 transition hover:-translate-y-[1px] hover:bg-white hover:text-primary dark:border-neutral-800 dark:bg-neutral-900/70 dark:text-neutral-300 dark:shadow-black/30 dark:hover:bg-neutral-900 dark:hover:text-primary xs:px-3"
+                            className="touch-target rounded-full border border-white/40 bg-white/70 px-2.5 py-1 text-xs font-medium text-neutral-600 shadow-sm shadow-white/40 transition hover:-translate-y-[1px] hover:bg-white hover:text-primary xs:px-3"
                         >
                             {link.label}
                         </a>

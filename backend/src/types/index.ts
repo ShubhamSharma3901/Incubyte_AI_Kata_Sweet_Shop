@@ -37,7 +37,6 @@ export const CreateSweetSchema = z.object({
 	category: z.string().min(1, "Category is required"),
 	price: z.number().positive("Price must be positive"),
 	quantity: z.number().int().min(0, "Quantity must be non-negative"),
-	description: z.string().optional(),
 });
 
 /** Validation schema for updating an existing sweet. */
@@ -46,7 +45,6 @@ export const UpdateSweetSchema = z.object({
 	category: z.string().min(1).optional(),
 	price: z.coerce.number().positive().optional(),
 	quantity: z.coerce.number().int().min(0).optional(),
-	description: z.string().optional(),
 });
 
 /** Validation schema for searching sweets via query parameters. */
