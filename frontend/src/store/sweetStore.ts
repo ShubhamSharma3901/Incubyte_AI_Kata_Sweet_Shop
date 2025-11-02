@@ -48,12 +48,10 @@ export const useSweetStore = create<SweetState>((set, get) => ({
         const { sweets, searchTerm, filters } = get();
 
         const filtered = sweets.filter((sweet) => {
-            // Search term filter (name and description)
+            // Search term filter (name only)
             if (searchTerm) {
                 const searchLower = searchTerm.toLowerCase();
-                const matchesSearch =
-                    sweet.name.toLowerCase().includes(searchLower) ||
-                    (sweet.description && sweet.description.toLowerCase().includes(searchLower));
+                const matchesSearch = sweet.name.toLowerCase().includes(searchLower);
                 if (!matchesSearch) return false;
             }
 

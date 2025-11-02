@@ -28,7 +28,6 @@ describe('SweetService', () => {
         category: 'Festival',
         price: 10,
         quantity: 50,
-        description: 'Traditional sweet',
     };
 
     beforeEach(() => {
@@ -50,7 +49,6 @@ describe('SweetService', () => {
                 category: sampleSweet.category,
                 price: sampleSweet.price,
                 quantity: sampleSweet.quantity,
-                description: sampleSweet.description,
             });
 
             expect(mockPrisma.sweet.findUnique).toHaveBeenCalledWith({
@@ -62,7 +60,6 @@ describe('SweetService', () => {
                     category: sampleSweet.category,
                     price: sampleSweet.price,
                     quantity: sampleSweet.quantity,
-                    description: sampleSweet.description,
                 },
             });
             expect(result).toEqual(sampleSweet);
@@ -77,7 +74,6 @@ describe('SweetService', () => {
                     category: 'Any',
                     price: 5,
                     quantity: 10,
-                    description: undefined,
                 })
             ).rejects.toThrow('Sweet with this name already exists');
 

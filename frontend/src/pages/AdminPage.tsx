@@ -201,11 +201,7 @@ export const AdminPage: React.FC = () => {
                                             <p className="text-responsive-xs text-muted-foreground">
                                                 {sweet.category} • ₹{sweet.price.toFixed(2)} • {sweet.quantity} in stock
                                             </p>
-                                            {sweet.description && (
-                                                <p className="text-responsive-xs text-muted-foreground mt-1 line-clamp-2">
-                                                    {sweet.description}
-                                                </p>
-                                            )}
+
                                         </div>
                                         <div className="flex gap-2 xs:ml-4">
                                             <Button
